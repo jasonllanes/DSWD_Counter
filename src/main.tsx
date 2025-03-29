@@ -7,40 +7,37 @@ import { Suspense, lazy } from "react";
 
 import NotFound from "./screens/notFound";
 import Loader from './components/loader/loader.tsx';
+import MainScreenContainer from './screens/main_screen/MainScreenContainer.tsx';
 
-const Page1= lazy(() =>
-  wait(1300).then(() => import("./screens/page1.tsx"))
-);
+// const Page1 = lazy(() =>
+//   wait(1300).then(() => import("./screens/page1.tsx"))
+// );
 
-const Page2= lazy(() =>
-  wait(1300).then(() => import("./screens/page2.tsx"))
+// const Page2 = lazy(() =>
+//   wait(1300).then(() => import("./screens/page2.tsx"))
+// );
+
+const MainPage = lazy(() =>
+  wait(1300).then(() => import("./screens/main_screen/MainScreenContainer.tsx"))
 );
 
 const router = createBrowserRouter([
   {
-    path: "/react-vite-supreme/",
-    element: <App />,
-    
+    path: "/",
+    element: <MainScreenContainer />,
+
     children: [
       {
-        path: "/react-vite-supreme/", 
-        element: <Navigate to="/react-vite-supreme/page1" />, 
+        path: "/",
+        element: <Navigate to="/dswd-counter/dashboard" />,
       },
       {
-        path: "/react-vite-supreme/page1",
+        path: "/dswd-counter/dashboard",
         element: <>
-        <Suspense fallback={<Loader />}>
-          <Page1 />
-        </Suspense>
-      </>,
-      },
-      {
-        path: "/react-vite-supreme/page2",
-        element: <>
-        <Suspense fallback={<Loader />}>
-          <Page2 />
-        </Suspense>
-      </>,
+          <Suspense fallback={<Loader />}>
+            <MainPage />
+          </Suspense>
+        </>,
       },
 
 
@@ -53,7 +50,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-function wait( time:number) {
+function wait(time: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, time);
   });
