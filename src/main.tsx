@@ -12,7 +12,9 @@ import { Suspense, lazy } from "react";
 import NotFound from "./screens/notFound";
 import Loader from "./components/loader/loader.tsx";
 
-const Page1 = lazy(() => wait(1300).then(() => import("./screens/page1.tsx")));
+const Dashboard = lazy(() =>
+  wait(1300).then(() => import("./screens/Dashboard.tsx"))
+);
 
 const Page2 = lazy(() => wait(1300).then(() => import("./screens/page2.tsx")));
 
@@ -31,7 +33,7 @@ const router = createBrowserRouter([
         element: (
           <>
             <Suspense fallback={<Loader />}>
-              <Page1 />
+              <Dashboard />
             </Suspense>
           </>
         ),
