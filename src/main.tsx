@@ -5,7 +5,6 @@ import {
   RouterProvider,
   createBrowserRouter,
 } from "react-router-dom";
-import App from "./App.tsx";
 import "./index.css";
 import { Suspense, lazy } from "react";
 
@@ -16,34 +15,23 @@ const Dashboard = lazy(() =>
   wait(1300).then(() => import("./screens/Dashboard.tsx"))
 );
 
-const Page2 = lazy(() => wait(1300).then(() => import("./screens/page2.tsx")));
 
 const router = createBrowserRouter([
   {
     path: "/dswd-counter/",
-    element: <App />,
+    element: <Dashboard />,
 
     children: [
       {
         path: "/dswd-counter/",
-        element: <Navigate to="/dswd-counter/page1" />,
+        element: <Navigate to="/dswd-counter/dashboard" />,
       },
       {
-        path: "/dswd-counter/page1",
+        path: "/dswd-counter/dashboard",
         element: (
           <>
             <Suspense fallback={<Loader />}>
               <Dashboard />
-            </Suspense>
-          </>
-        ),
-      },
-      {
-        path: "/dswd-counter/page2",
-        element: (
-          <>
-            <Suspense fallback={<Loader />}>
-              <Page2 />
             </Suspense>
           </>
         ),

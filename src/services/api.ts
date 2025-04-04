@@ -88,8 +88,8 @@ export const fetchCurrentData = (): Promise<DashboardData> => {
 };
 
 export const fetchHistoricalData = (
-  startDate: string,
-  endDate: string
+  // startDate: string,
+  // endDate: string
 ): Promise<HistoricalDataItem[]> => {
   // Simulate historical data
   return new Promise((resolve) => {
