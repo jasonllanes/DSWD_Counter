@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 type LineData = {
   count: number;
   timestamp: string;
+  totalScore?: number; // Add totalScore to track cumulative count
 };
 
 type LineStatus = {
@@ -14,72 +15,64 @@ const MainScreenContainer = () => {
   // State for all 8 lines
   const [lineData, setLineData] = useState<LineStatus>({});
   const [connectionStatus, setConnectionStatus] = useState("Connecting...");
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  // Function to trigger data collection
+  const handleCollectData = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send("SEND_DATA");
+    } else {
+      console.error("WebSocket is not connected");
+    }
+  };
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4000");
+    const wsConnection = new WebSocket("ws://localhost:4000");
+
+    // Store WebSocket instance in state
+    setWs(wsConnection);
 
     // Connection event handlers
-    ws.onopen = () => {
+    wsConnection.onopen = () => {
       setConnectionStatus("Connected");
       console.log("Connected to WebSocket server");
     };
 
-    ws.onclose = () => {
+    wsConnection.onclose = () => {
       setConnectionStatus("Disconnected");
       console.log("Disconnected from WebSocket server");
     };
 
-    ws.onerror = (error) => {
+    wsConnection.onerror = (error) => {
       setConnectionStatus("Error");
       console.error("WebSocket error:", error);
     };
 
-    ws.onmessage = (event) => {
+    wsConnection.onmessage = (event) => {
       try {
         const text = event.data;
         console.log("Received:", text);
 
-        // Try to parse as JSON first (for structured data)
-        try {
-          const data = JSON.parse(text);
-          if (data.lineId && typeof data.count === "number") {
-            // Handle structured data format
+        // Handle the "Sensor X triggered, Total Score: Y" format
+        if (text.includes("Total Score:")) {
+          // Extract the sensor number and total score
+          const sensorMatch = text.match(/Sensor (\d+)/);
+          const scoreMatch = text.match(/Total Score: (\d+)/);
+
+          if (sensorMatch && scoreMatch) {
+            const lineId = parseInt(sensorMatch[1]);
+            const totalScore = parseInt(scoreMatch[1]);
+
+            console.log(`Updating Line ${lineId} with score ${totalScore}`);
+
             setLineData((prev) => ({
               ...prev,
-              [data.lineId]: {
-                count: data.count,
+              [lineId]: {
+                count: totalScore, // Use total score as current count
                 timestamp: new Date().toISOString(),
+                totalScore: totalScore, // Use total score directly
               },
             }));
-            return;
-          }
-        } catch (e) {
-          // If not JSON, handle text format
-          if (text.includes("Total Score:")) {
-            // Extract line number and count from "Total Score: Line X: Y"
-            const match = text.match(/Line (\d+):\s*(\d+)/);
-            if (match) {
-              const [, lineId, count] = match;
-              setLineData((prev) => ({
-                ...prev,
-                [parseInt(lineId)]: {
-                  count: parseInt(count),
-                  timestamp: new Date().toISOString(),
-                },
-              }));
-            }
-          } else if (text.startsWith("count:")) {
-            // Handle simple count format with line number
-            const [lineId, count] = text.split(":").slice(1);
-            if (lineId && count) {
-              setLineData((prev) => ({
-                ...prev,
-                [parseInt(lineId)]: {
-                  count: parseInt(count),
-                  timestamp: new Date().toISOString(),
-                },
-              }));
-            }
           }
         }
       } catch (error) {
@@ -89,8 +82,8 @@ const MainScreenContainer = () => {
 
     // Cleanup function
     return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
+      if (wsConnection.readyState === WebSocket.OPEN) {
+        wsConnection.close();
       }
     };
   }, []);
@@ -98,7 +91,7 @@ const MainScreenContainer = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">DSWD Relief Counter Dashboard</h1>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
         <p className="text-sm">
           Status:{" "}
           <span
@@ -111,6 +104,13 @@ const MainScreenContainer = () => {
             {connectionStatus}
           </span>
         </p>
+        <button
+          onClick={handleCollectData}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={connectionStatus !== "Connected"}
+        >
+          Collect Sensor Data
+        </button>
       </div>
 
       {/* Display data for each line */}
@@ -118,13 +118,26 @@ const MainScreenContainer = () => {
         {Array.from({ length: 8 }, (_, i) => i + 1).map((lineId) => (
           <div key={lineId} className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-2">Line {lineId}</h2>
-            <p className="text-2xl font-bold">{lineData[lineId]?.count || 0}</p>
-            <p className="text-sm text-gray-500">
-              Last updated:{" "}
-              {lineData[lineId]?.timestamp
-                ? new Date(lineData[lineId].timestamp).toLocaleTimeString()
-                : "Never"}
-            </p>
+            <div className="space-y-2">
+              <div>
+                <p className="text-sm text-gray-600">Current Count</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {lineData[lineId]?.count || 0}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Total Score</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {lineData[lineId]?.totalScore || 0}
+                </p>
+              </div>
+              <p className="text-sm text-gray-500">
+                Last updated:{" "}
+                {lineData[lineId]?.timestamp
+                  ? new Date(lineData[lineId].timestamp).toLocaleTimeString()
+                  : "Never"}
+              </p>
+            </div>
           </div>
         ))}
       </div>
