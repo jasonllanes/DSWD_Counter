@@ -8,7 +8,7 @@ const NotFound = () => {
     <div className="flex items-center justify-center w-screen h-screen bg-background ">
       <div className=" min-w-[300px] w-[50%] flex flex-col items-center">
         <div className="flex items-center gap-3 ">
-          <h1 className=" text-4xl font-bold md:text-[30px] text-secondary-foreground  ">
+          <h1 className=" text-4xl font-bold md:text-[30px] text-secondary-foreground">
             404 not Found
           </h1>
         </div>
