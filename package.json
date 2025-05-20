@@ -20,6 +20,8 @@
     "axios": "^1.7.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "firebase": "latest",
     "framer-motion": "^11.0.5",
     "lucide-react": "^0.274.0",
@@ -28,6 +30,7 @@
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
     "react-router-dom": "^6.15.0",
+    "recharts": "^2.15.3",
     "sweetalert2": "^11.14.5",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
@@ -35,6 +38,7 @@
     "xlsx": "latest"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20.5.9",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
