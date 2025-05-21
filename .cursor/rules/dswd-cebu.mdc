@@ -1,0 +1,267 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# DSWD Relief Counter Dashboard - Development Guidelines
+
+## Project Overview
+Real-time production monitoring dashboard for DSWD Relief Counter System, tracking packaging metrics across 8 conveyor lines with live updates, cloud sync, visualizations, and Excel export capabilities.
+
+## Technical Stack
+- Framework: Next.js 14 with App Router
+- Frontend: React + TypeScript
+- UI Components: shadcn/ui + Tailwind CSS
+- Data Management: TanStack Table
+- Visualizations: Recharts
+- Real-time: Next.js WebSocket API Routes (Arduino Integration)
+- Cloud: Firebase Firestore
+- Reporting: ExcelJS
+
+## Project Structure
+```typescript
+src/
+  ├── app/                 // Next.js app router pages
+  │   ├── api/            // API routes including WebSocket
+  │   └── (routes)/       // Page routes
+  ├── assets/             // Static assets (images, icons)
+  ├── components/         // Shared/global components
+  │   ├── ui/            // shadcn/ui components
+  │   └── shared/        // Cross-feature components
+  ├── screens/           // Feature-based screens
+  │   └── [feature]/     // e.g., dashboard, reports
+  │       ├── components/ // Feature-specific components
+  │       ├── hooks/     // Feature-specific hooks
+  │       └── utils/     // Feature-specific utilities
+  ├── hooks/             // Global custom hooks
+  ├── services/          // External service integrations
+  │   ├── api/          // API services
+  │   ├── firebase/     // Firebase services
+  │   └── websocket/    // WebSocket services
+  ├── types/             // Global TypeScript types
+  ├── utils/             // Global utility functions
+  └── lib/              // Third-party configurations
+```
+
+## Code Organization Guidelines
+
+### Next.js Specific Patterns
+1. **API Routes** (`/app/api`)
+   ```typescript
+   // /app/api/socket/route.ts
+   import { WebSocketHandler } from '@/services/websocket/handler';
+   
+   export function GET(req: Request) {
+     const { socket, response } = WebSocketHandler.upgrade(req);
+     return response;
+   }
+   ```
+
+2. **Page Components** (`/app/(routes)`)
+   ```typescript
+   // /app/(routes)/dashboard/page.tsx
+   import { DashboardScreen } from '@/screens/dashboard';
+   
+   export default function DashboardPage() {
+     return <DashboardScreen />;
+   }
+   ```
+
+### Component Structure
+1. **Global Components** (`/components`)
+   ```typescript
+   // Button.tsx
+   export const Button = ({ children, ...props }: ButtonProps) => {
+     return <button className="btn-primary" {...props}>{children}</button>;
+   };
+   ```
+
+2. **Feature Components** (`/screens/[feature]/components`)
+   ```typescript
+   // ProductionTable.tsx
+   export const ProductionTable = ({ data }: ProductionTableProps) => {
+     const { sorting, setSorting } = useTableSorting();
+     return (/* Component JSX */);
+   };
+   ```
+
+### WebSocket Implementation
+```typescript
+// services/websocket/handler.ts
+export class WebSocketHandler {
+  static upgrade(req: Request) {
+    // WebSocket upgrade logic
+  }
+
+  static handleConnection(socket: WebSocket) {
+    // Connection handling
+  }
+}
+```
+
+### Performance Requirements
+- First Contentful Paint < 1.5s
+- Time to Interactive < 3.5s
+- Maintain 60fps during animations
+- Optimize WebSocket connections
+- Implement proper error recovery
+- Use Next.js Image optimization
+
+### Security Guidelines
+- Implement proper Firebase security rules
+- Sanitize WebSocket data
+- Secure API endpoints
+- Handle sensitive data appropriately
+- Use Next.js middleware for auth/protection
+
+### Documentation Requirements
+- Document all custom hooks
+- Add JSDoc comments for complex functions
+- Maintain README for each feature folder
+- Include setup instructions for new developers
+- Document WebSocket protocol
+
+### Version Control
+- Use feature branches
+- Write descriptive commit messages
+- Review PR before merging
+- Keep PR size manageable
+
+### Build and Deploy
+- Use Next.js production build
+- Implement proper environment configuration
+- Monitor build size and performance
+- Set up CI/CD pipeline
+
+### Testing Guidelines
+- Unit test hooks and utilities
+- Integration test feature components
+- E2E test critical user flows
+- Test WebSocket reconnection logic
+
+## Feature Implementation Guidelines
+
+### 1. Real-time Data Management
+```typescript
+// screens/dashboard/hooks/useProductionData.ts
+export const useProductionData = () => {
+  const socket = useWebSocket(ARDUINO_ENDPOINT);
+  const [metrics, setMetrics] = useState<ProductionMetrics[]>([]);
+
+  useEffect(() => {
+    // 5-second refresh implementation
+  }, [socket]);
+
+  return { metrics, isLoading, error };
+};
+```
+
+### 2. UI Components
+- Use shadcn/ui components as base
+- Extend with Tailwind CSS for custom styling
+- Implement responsive design using Tailwind breakpoints
+```typescript
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <StatisticCard />
+</div>
+```
+
+### 3. Data Visualization
+- Use Recharts for all chart components
+- Implement consistent loading states
+- Handle error boundaries
+```typescript
+export const ProductionChart = ({ data }: ChartProps) => {
+  if (!data) return <LoadingSpinner />;
+  
+  return (
+    <ResponsiveContainer>
+      <LineChart data={data}>
+        {/* Chart configuration */}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+```
+
+### 4. State Management
+- Use React Query for server state
+- Use context for theme/global state
+- Use local state for component-specific data
+
+### 5. Performance Optimization
+```typescript
+// Memoization example
+export const ProductionMetrics = memo(({ data }: MetricsProps) => {
+  const memoizedCalculations = useMemo(() => {
+    return calculateEfficiency(data);
+  }, [data]);
+
+  return (/* Component JSX */);
+});
+```
+
+## Best Practices
+
+### TypeScript Usage
+- Use strict type checking
+- Avoid `any` type
+- Use discriminated unions for complex states
+```typescript
+type ProductionState =
+  | { status: 'loading' }
+  | { status: 'error'; error: Error }
+  | { status: 'success'; data: ProductionData };
+```
+
+### Error Handling
+- Implement error boundaries for feature components
+- Use toast notifications for user feedback
+- Log errors to monitoring service
+
+### Testing Guidelines
+- Unit test hooks and utilities
+- Integration test feature components
+- E2E test critical user flows
+
+### Performance Requirements
+- First Contentful Paint < 1.5s
+- Time to Interactive < 3.5s
+- Maintain 60fps during animations
+- Optimize WebSocket connections
+
+### Security Guidelines
+- Implement proper Firebase security rules
+- Sanitize WebSocket data
+- Secure API endpoints
+- Handle sensitive data appropriately
+
+## Efficiency Calculations
+```typescript
+export const calculateEfficiency = (
+  actual: number,
+  target: number
+): number => {
+  return target > 0 ? (actual / target) * 100 : 0;
+};
+```
+
+## Documentation Requirements
+- Document all custom hooks
+- Add JSDoc comments for complex functions
+- Maintain README for each feature folder
+- Include setup instructions for new developers
+
+## Version Control
+- Use feature branches
+- Write descriptive commit messages
+- Review PR before merging
+- Keep PR size manageable
+
+## Build and Deploy
+- Use Next.js production build
+- Implement proper environment configuration
+- Monitor build size and performance
+
+
+- Set up CI/CD pipeline
