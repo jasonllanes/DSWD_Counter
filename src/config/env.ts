@@ -26,6 +26,7 @@ interface AppConfig {
 // Validate environment variables
 const validateEnvVar = (key: string, defaultValue?: string): string => {
   const value = import.meta.env[key] || defaultValue;
+  // Only throw error if no default value was provided
   if (!value && defaultValue === undefined) {
     throw new Error(`Missing required environment variable: ${key}`);
   }
@@ -41,7 +42,8 @@ export const config: AppConfig = {
     storageBucket: validateEnvVar('VITE_FIREBASE_STORAGE_BUCKET'),
     messagingSenderId: validateEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID'),
     appId: validateEnvVar('VITE_FIREBASE_APP_ID'),
-    measurementId: validateEnvVar('VITE_FIREBASE_MEASUREMENT_ID', undefined),
+    // Make measurementId optional by providing a default value
+    measurementId: validateEnvVar('VITE_FIREBASE_MEASUREMENT_ID', ''),
   },
   websocket: {
     url: validateEnvVar('VITE_WS_URL', 'ws://localhost:4000'),
