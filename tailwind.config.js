@@ -6,7 +6,7 @@ module.exports = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   theme: {
     container: {
       center: true,
@@ -16,7 +16,6 @@ module.exports = {
       },
     },
     screens: {
-
       'lg': {'max': '1220px'},
       // => @media (max-width: 1023px) { ... }
 
@@ -28,9 +27,13 @@ module.exports = {
 
       'sm': {'max': '639px'},
       // => @media (max-width: 639px) { ... }
-  },
+    },
     extend: {
       colors: {
+        'dswd-blue': '#2563EB',
+        'dswd-yellow': '#FCD34D',
+        'dswd-red': '#DC2626',
+        'dswd-green': '#059669',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -69,6 +72,9 @@ module.exports = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {
