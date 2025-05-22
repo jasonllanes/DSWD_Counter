@@ -1,0 +1,45 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# DSWD Relief Counter Dashboard Cursor Rule
+
+## Project Overview
+
+### Core Project Purpose
+- Real-time monitoring system for DSWD relief goods production across 8 conveyor lines
+- Acts as a bridge between physical sensors/Arduino and a modern web dashboard
+- Supports warehouse staff in tracking and managing production output efficiently
+
+### Technical Architecture
+
+#### 1. Hardware Layer (handled by another team)
+- 8 conveyor lines, each equipped with physical sensors
+- Arduino Mega acts as the central data collector
+- WebSocket is used for transmitting real-time data to the dashboard
+
+#### 2. Dashboard Layer (your focus)
+- Frontend React + TypeScript web application
+- Real-time data visualization and monitoring
+- Metrics tracked per conveyor line:
+  - Daily Target (default: 1000, configurable)
+  - Hourly Target (default: 166, configurable)
+  - Production/Hr (calculated live based on sensor data)
+  - Actual Production (total count per line)
+
+#### 3. Data Management
+- Local storage for offline resilience
+- Firebase Firestore for manual cloud backups
+- Excel export for reports
+- Daily reset functionality (auto at midnight or via manual trigger)
+
+#### 4. Additional Features
+- Historical production data tracking and visualization
+- Achievement alerts or production milestones
+- Basic authentication (Google sign-in + email/password login)
+
+---
+
+
+This rule gives Cursor a clear understanding of what this project is about — its core goals, architecture split, and user-facing outcomes — without diving into internal technical implementation.
