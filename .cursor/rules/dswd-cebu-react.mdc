@@ -1,0 +1,345 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# DSWD Relief Counter Dashboard - Development Guidelines
+
+## Project Overview
+Real-time production monitoring dashboard for DSWD Relief Counter System, tracking packaging metrics across 8 conveyor lines with live updates, cloud sync, visualizations, and Excel export capabilities.
+
+## Technical Stack
+- Frontend: React + TypeScript + Vite
+- UI Components: shadcn/ui + Tailwind CSS
+- Data Management: TanStack Table
+- Visualizations: Recharts
+- Real-time: WebSocket (Arduino Integration)
+- Cloud: Firebase Firestore
+- Reporting: ExcelJS
+
+## Project Structure
+```typescript
+src/
+  ├── assets/              // Static assets (images, icons)
+  ├── components/          // Shared/global components
+  │   ├── ui/             // shadcn/ui components
+  │   └── shared/         // Cross-feature components
+  ├── screens/            // Feature-based screens
+  │   └── [feature]/      // e.g., dashboard, reports
+  │       ├── components/ // Feature-specific components
+  │       ├── hooks/      // Feature-specific hooks
+  │       └── utils/      // Feature-specific utilities
+  ├── hooks/              // Global custom hooks
+  ├── services/           // External service integrations
+  │   ├── api/           // API services
+  │   ├── firebase/      // Firebase services
+  │   └── websocket/     // WebSocket services
+  ├── types/              // Global TypeScript types
+  ├── utils/              // Global utility functions
+  └── lib/               // Third-party configurations
+```
+
+## Code Organization Guidelines
+
+### Component Structure
+1. **Global Components** (`/components`)
+```typescript
+// Button.tsx
+export const Button = ({ children, ...props }: ButtonProps) => {
+  return <button className="btn-primary" {...props}>{children}</button>;
+};
+```
+
+2. **Feature Components** (`/screens/[feature]/components`)
+```typescript
+// ProductionTable.tsx
+export const ProductionTable = ({ data }: ProductionTableProps) => {
+  const { sorting, setSorting } = useTableSorting();
+  return (/* Component JSX */);
+};
+```
+
+### Code Style and Patterns
+
+1. **Component Declarations**
+```typescript
+// Preferred
+export const ComponentName = ({ prop1, prop2 }: Props) => {
+  // Implementation
+};
+
+// Avoid
+function ComponentName() {}
+export default ComponentName;
+```
+
+2. **Custom Hooks**
+```typescript
+// hooks/useWebSocket.ts
+export const useWebSocket = (url: string) => {
+  const [data, setData] = useState<ProductionData | null>(null);
+  // Implementation
+  return { data, isConnected, error };
+};
+```
+
+3. **Type Definitions**
+```typescript
+// types/production.ts
+export interface ProductionMetrics {
+  lineId: number;
+  hourlyTarget: number;
+  actualProduction: number;
+  efficiency: number;
+}
+```
+
+### WebSocket Implementation
+```typescript
+// services/websocket/config.ts
+export const WS_CONFIG = {
+  RECONNECT_INTERVAL: 5000,
+  MAX_RETRIES: 3,
+  ENDPOINTS: {
+    ARDUINO: 'ws://localhost:4000',
+  }
+};
+
+// Reconnection logic
+export const createWebSocketConnection = (url: string) => {
+  let retries = 0;
+  const ws = new WebSocket(url);
+  
+  ws.onclose = () => {
+    if (retries < WS_CONFIG.MAX_RETRIES) {
+      setTimeout(() => {
+        retries++;
+        createWebSocketConnection(url);
+      }, WS_CONFIG.RECONNECT_INTERVAL);
+    }
+  };
+  
+  return ws;
+};
+```
+
+### Environment Configuration
+```typescript
+// Required Environment Variables
+VITE_ARDUINO_WS_URL=ws://localhost:4000
+VITE_FIREBASE_CONFIG={...}
+VITE_API_BASE_URL=http://localhost:3000
+
+// .env validation
+const requiredEnvVars = [
+  'VITE_ARDUINO_WS_URL',
+  'VITE_FIREBASE_CONFIG',
+  'VITE_API_BASE_URL'
+];
+
+requiredEnvVars.forEach(envVar => {
+  if (!import.meta.env[envVar]) {
+    throw new Error(`Missing required environment variable: ${envVar}`);
+  }
+});
+```
+
+### Tailwind Theme Configuration
+```typescript
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        'dswd-blue': '#2563EB',
+        'dswd-yellow': '#FCD34D',
+        'dswd-red': '#DC2626',
+        'dswd-green': '#059669'
+      },
+      screens: {
+        'lg': {'max': '1220px'},
+        'slg': {'max': '1100px'},
+        'md': {'max': '767px'},
+        'sm': {'max': '639px'},
+      }
+    },
+  },
+}
+```
+
+## Feature Implementation Guidelines
+
+### 1. Real-time Data Management
+```typescript
+// screens/dashboard/hooks/useProductionData.ts
+export const useProductionData = () => {
+  const socket = useWebSocket(ARDUINO_ENDPOINT);
+  const [metrics, setMetrics] = useState<ProductionMetrics[]>([]);
+
+  useEffect(() => {
+    // 5-second refresh implementation
+  }, [socket]);
+
+  return { metrics, isLoading, error };
+};
+```
+
+### 2. UI Components
+- Use shadcn/ui components as base
+- Extend with Tailwind CSS for custom styling
+- Implement responsive design using Tailwind breakpoints
+```typescript
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <StatisticCard />
+</div>
+```
+
+### 3. Data Visualization
+- Use Recharts for all chart components
+- Implement consistent loading states
+- Handle error boundaries
+```typescript
+export const ProductionChart = ({ data }: ChartProps) => {
+  if (!data) return <LoadingSpinner />;
+  
+  return (
+    <ResponsiveContainer>
+      <LineChart data={data}>
+        {/* Chart configuration */}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+```
+
+### 4. State Management
+- Use React Query for server state
+- Use context for theme/global state
+- Use local state for component-specific data
+
+### 5. Performance Optimization
+```typescript
+// Memoization example
+export const ProductionMetrics = memo(({ data }: MetricsProps) => {
+  const memoizedCalculations = useMemo(() => {
+    return calculateEfficiency(data);
+  }, [data]);
+
+  return (/* Component JSX */);
+});
+```
+
+## Vite-Specific Configuration
+
+### Development Server
+```typescript
+// vite.config.ts
+export default defineConfig({
+  server: {
+    port: 3001,
+    host: '0.0.0.0',
+    hmr: {
+      overlay: true
+    },
+    watch: {
+      usePolling: true
+    }
+  },
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          charts: ['recharts'],
+          ui: ['@radix-ui/react-dropdown-menu']
+        }
+      }
+    }
+  }
+});
+```
+
+### Production Build Optimization
+- Enable code splitting for routes
+- Implement lazy loading for heavy components
+- Configure proper caching strategies
+- Set up error monitoring and logging
+
+```typescript
+// Example of route-based code splitting
+const Dashboard = lazy(() => import('./screens/dashboard'));
+const Reports = lazy(() => import('./screens/reports'));
+
+// Implement Suspense boundary
+<Suspense fallback={<LoadingSpinner />}>
+  <Routes>
+    <Route path="/dashboard" element={<Dashboard />} />
+    <Route path="/reports" element={<Reports />} />
+  </Routes>
+</Suspense>
+```
+
+## Best Practices
+
+### TypeScript Usage
+- Use strict type checking
+- Avoid `any` type
+- Use discriminated unions for complex states
+```typescript
+type ProductionState =
+  | { status: 'loading' }
+  | { status: 'error'; error: Error }
+  | { status: 'success'; data: ProductionData };
+```
+
+### Error Handling
+- Implement error boundaries for feature components
+- Use toast notifications for user feedback
+- Log errors to monitoring service
+
+### Testing Guidelines
+- Unit test hooks and utilities
+- Integration test feature components
+- E2E test critical user flows
+
+### Performance Requirements
+- First Contentful Paint < 1.5s
+- Time to Interactive < 3.5s
+- Maintain 60fps during animations
+- Optimize WebSocket connections
+
+### Security Guidelines
+- Implement proper Firebase security rules
+- Sanitize WebSocket data
+- Secure API endpoints
+- Handle sensitive data appropriately
+
+## Efficiency Calculations
+```typescript
+export const calculateEfficiency = (
+  actual: number,
+  target: number
+): number => {
+  return target > 0 ? (actual / target) * 100 : 0;
+};
+```
+
+## Documentation Requirements
+- Document all custom hooks
+- Add JSDoc comments for complex functions
+- Maintain README for each feature folder
+- Include setup instructions for new developers
+
+## Version Control
+- Use feature branches
+- Write descriptive commit messages
+- Review PR before merging
+- Keep PR size manageable
+
+## Build and Deploy
+- Use Vite for development and production builds
+- Implement proper environment configuration
+- Maintain CI/CD pipeline
+- Monitor build size and performance
+
