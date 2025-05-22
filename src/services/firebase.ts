@@ -1,6 +1,4 @@
-import { initializeApp } from "firebase/app";
 import {
-  getFirestore,
   collection,
   addDoc,
   getDocs,
@@ -13,21 +11,10 @@ import type {
   FirebaseResponse,
   HistoricalDataItem,
 } from "../types";
+import { db } from '@/config/firebase';
 
-// Your Firebase configuration
-// Replace with your actual Firebase config
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Collection references
+const PRODUCTION_COLLECTION = 'production_data';
 
 // Save dashboard data to Firestore
 export const saveDashboardData = async (
@@ -67,5 +54,42 @@ export const getRecentDashboardData = async (
   } catch (error) {
     console.error("Error getting documents: ", error);
     return [];
+  }
+};
+
+export const firebaseService = {
+  // Save production data to Firebase
+  async saveProductionData(data: DashboardData) {
+    try {
+      const docRef = await addDoc(collection(db, PRODUCTION_COLLECTION), {
+        ...data,
+        timestamp: new Date().toISOString()
+      });
+      console.log('✅ Data saved to Firebase:', docRef.id);
+      return docRef.id;
+    } catch (error) {
+      console.error('❌ Error saving data:', error);
+      throw error;
+    }
+  },
+
+  // Get latest production records
+  async getLatestRecords(limitCount: number = 10) {
+    try {
+      const q = query(
+        collection(db, PRODUCTION_COLLECTION),
+        orderBy('timestamp', 'desc'),
+        limit(limitCount)
+      );
+      
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('❌ Error fetching records:', error);
+      throw error;
+    }
   }
 };
