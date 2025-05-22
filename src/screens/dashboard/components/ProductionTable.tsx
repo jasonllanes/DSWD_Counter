@@ -10,6 +10,9 @@ import type { DashboardData, DashboardRowData } from "../../../types";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import dswdLogo from "../../../assets/dswd_logo.png";
+import { firebaseService } from "@/services/firebase";
+import { isFeatureEnabled } from "@/config/env";
+import Swal from "sweetalert2";
 
 type ProductionTableProps = {
   data: DashboardData | null;
@@ -219,6 +222,31 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     }
   };
 
+  const handleSaveToCloud = async () => {
+    if (!data) return;
+
+    try {
+      // Save to Firebase
+      await firebaseService.saveProductionData(data);
+      
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Data Saved!',
+        text: 'Production data has been uploaded to the cloud.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error('Failed to save data:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: 'Could not save data to the cloud. Please try again.',
+      });
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-lg shadow-xl overflow-hidden mb-6 border border-blue-200">
       <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-blue-50">
@@ -234,14 +262,16 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
             <Download size={16} className="mr-2" />
             Export to Excel
           </button>
-          <button
-            onClick={onSaveToCloud}
-            disabled={saving}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm disabled:opacity-50"
-          >
-            <Upload size={16} className="mr-2" />
-            {saving ? "Saving..." : "Add to Cloud"}
-          </button>
+          {isFeatureEnabled('mockData') && (
+            <button
+              onClick={handleSaveToCloud}
+              disabled={saving}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm disabled:opacity-50"
+            >
+              <Upload size={16} className="mr-2" />
+              {saving ? "Saving..." : "Add to Cloud"}
+            </button>
+          )}
         </div>
       </div>
 
