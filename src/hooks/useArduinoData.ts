@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getWebSocketConfig, isFeatureEnabled } from '@/config/env';
+import { getWebSocketConfig } from '@/config/env';
 
 interface ArduinoData {
+  sensorId?: number;
   weight: number;
   timestamp: string;
+  totalScore?: number;
 }
 
 export const useArduinoData = () => {
@@ -23,9 +25,29 @@ export const useArduinoData = () => {
 
     ws.onmessage = (event) => {
       try {
-        const parsedData = JSON.parse(event.data);
+        // Handle both JSON and string formats
+        let parsedData: any;
+        
+        try {
+          parsedData = JSON.parse(event.data);
+        } catch {
+          // If not JSON, try parsing the Arduino string format
+          const arduinoData = event.data.toString();
+          const matches = arduinoData.match(/Sensor (\d+) triggered, Total Score: (\d+)/);
+          
+          if (matches) {
+            parsedData = {
+              sensorId: parseInt(matches[1]),
+              weight: 1, // Trigger event
+              totalScore: parseInt(matches[2]),
+            };
+          } else {
+            throw new Error('Invalid data format');
+          }
+        }
+
         setData({
-          weight: parsedData.weight,
+          ...parsedData,
           timestamp: new Date().toISOString()
         });
       } catch (err) {
@@ -53,23 +75,8 @@ export const useArduinoData = () => {
   }, []);
 
   useEffect(() => {
-    // Only connect to real Arduino if mock data is disabled
-    if (!isFeatureEnabled('mockData')) {
-      const cleanup = connect();
-      return cleanup;
-    }
-    
-    // Mock data simulation when enabled
-    if (isFeatureEnabled('mockData')) {
-      const interval = setInterval(() => {
-        setData({
-          weight: Math.random() * 100,
-          timestamp: new Date().toISOString()
-        });
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
+    const cleanup = connect();
+    return cleanup;
   }, [connect]);
 
   return {

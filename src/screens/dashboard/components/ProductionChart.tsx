@@ -1,22 +1,52 @@
-import React from "react";
-import { BarChart2 } from "react-feather";
+import React from 'react';
+import { DashboardData } from '../../../types';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ReferenceLine
+} from 'recharts';
 
-const ProductionChart: React.FC = () => {
-    return (
-        <div className="w-full bg-white rounded-lg shadow-xl overflow-hidden border border-blue-200">
-            <div className="p-5">
-                <h2 className="text-lg font-medium text-blue-800 mb-4 flex items-center">
-                    <BarChart2 size={18} className="mr-2" />
-                    Production by Line
-                </h2>
-                <div className="h-64 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100">
-                    <p className="text-blue-800 text-sm">
-                        Production chart would be displayed here
-                    </p>
-                </div>
-            </div>
-        </div>
-    );
+interface ProductionChartProps {
+  data: DashboardData | null;
+}
+
+const ProductionChart: React.FC<ProductionChartProps> = ({ data }) => {
+  if (!data) return null;
+
+  // Transform data for the chart
+  const chartData = data.lines.map(line => ({
+    name: `Line ${line.id}`,
+    actual: line.actualProduction,
+    target: line.dailyTarget,
+    efficiency: Math.round((line.actualProduction / line.dailyTarget) * 100)
+  }));
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-lg border border-blue-200">
+      <h2 className="text-lg font-medium text-blue-800 mb-4">Production vs Target</h2>
+      <div className="h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" />
+            <Tooltip />
+            <Legend />
+            <Bar yAxisId="left" dataKey="actual" name="Actual Production" fill="#3B82F6" />
+            <Bar yAxisId="left" dataKey="target" name="Daily Target" fill="#FCD34D" />
+            <ReferenceLine y={0} stroke="#000" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
 };
 
 export default ProductionChart;
