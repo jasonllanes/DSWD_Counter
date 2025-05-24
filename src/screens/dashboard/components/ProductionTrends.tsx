@@ -133,7 +133,7 @@ const ProductionTrends: React.FC<ProductionTrendsProps> = ({ data }) => {
                     <LineChart data={activeData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="period" />
-                        <YAxis tickFormatter={formatYAxis} />
+                        <YAxis tickFormatter={formatYAxis} domain={[0, 'auto']} />
                         <Tooltip />
                         <Legend />
                         <Line
