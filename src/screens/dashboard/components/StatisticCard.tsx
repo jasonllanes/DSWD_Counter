@@ -42,7 +42,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({ data }) => {
     if (!statistics) return null;
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-5 mb-6">
             {/* Overall Efficiency Card */}
             <div className="bg-white p-6 rounded-lg shadow-lg border border-blue-200">
                 <div className="flex justify-between items-start mb-4">
