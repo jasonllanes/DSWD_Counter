@@ -35,12 +35,11 @@ const ProductionChart: React.FC<ProductionChartProps> = ({ data }) => {
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
-            <YAxis yAxisId="left" />
-            <YAxis yAxisId="right" orientation="right" />
+            <YAxis />
             <Tooltip />
             <Legend />
-            <Bar yAxisId="left" dataKey="actual" name="Actual Production" fill="#3B82F6" />
-            <Bar yAxisId="left" dataKey="target" name="Daily Target" fill="#FCD34D" />
+            <Bar dataKey="actual" name="Actual Production" fill="#3B82F6" />
+            <Bar dataKey="target" name="Daily Target" fill="#FCD34D" />
             <ReferenceLine y={0} stroke="#000" />
           </BarChart>
         </ResponsiveContainer>
