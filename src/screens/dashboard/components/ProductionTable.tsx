@@ -14,12 +14,14 @@ import { firebaseService } from "@/services/firebase";
 import { isFeatureEnabled } from "@/config/env";
 import Swal from "sweetalert2";
 import DateRangePicker from "./DateRangePicker";
+import EditableCell from "./EditableCell";
 
 type ProductionTableProps = {
   data: DashboardData | null;
   saving: boolean;
   onExportToExcel: () => void;
   onSaveToCloud: () => void;
+  onUpdateData: (updatedData: DashboardData) => void;
 };
 
 type LineData = {
@@ -40,17 +42,66 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
   saving,
   onExportToExcel,
   onSaveToCloud,
+  onUpdateData,
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Define table structure
   const rows = [
-    { id: "dailyTarget", name: "Daily Target" },
-    { id: "hourlyTarget", name: "Hourly Target" },
-    { id: "productionPerHour", name: "Production / Hr" },
-    { id: "actualProduction", name: "Actual Production" },
+    { id: "dailyTarget", name: "Daily Target", isEditable: true },
+    { id: "hourlyTarget", name: "Hourly Target", isEditable: true },
+    { id: "productionPerHour", name: "Production / Hr", isEditable: false },
+    { id: "actualProduction", name: "Actual Production", isEditable: false },
   ];
+
+  // Handle cell value updates  
+  const handleCellUpdate = (lineId: number, field: keyof LineData, newValue: number) => {
+    if (!data) return;
+
+    console.log(`Updating ${field} for Line ${lineId} to ${newValue}`);
+
+    // Create a deep copy of the data
+    const updatedData: DashboardData = {
+      ...data,
+      lines: data.lines.map((line) => {
+        if (line.id === lineId) {
+          // If we're updating hourlyTarget, calculate productionPerHour
+          if (field === 'hourlyTarget') {
+            return {
+              ...line,
+              [field]: newValue,
+              // Update production per hour based on actual production
+              productionPerHour: Math.round(line.actualProduction / (newValue > 0 ? newValue : 1))
+            };
+          }
+          // Just update the field otherwise
+          return { ...line, [field]: newValue };
+        }
+        return { ...line };
+      })
+    };
+
+    console.log("Updated data:", updatedData);
+
+    // Update state to show there are unsaved changes
+    setHasUnsavedChanges(true);
+    
+    // Call the parent component's update function
+    onUpdateData(updatedData);
+    
+    // Show a small toast notification
+    Swal.fire({
+      title: 'Value Updated',
+      text: `${field === 'dailyTarget' ? 'Daily' : 'Hourly'} target for Line ${lineId} updated to ${newValue}`,
+      icon: 'success',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
+  };
 
   const columnHelper = createColumnHelper<DashboardRowData>();
 
@@ -78,12 +129,14 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
           // Determine if production is below target
           const isProductionRow = row.metric === "Production / Hr";
           const isActualProductionRow = row.metric === "Actual Production";
+          const isDailyTargetRow = row.metric === "Daily Target";
+          const isHourlyTargetRow = row.metric === "Hourly Target";
           const hourlyTarget = data?.lines[lineId - 1]?.hourlyTarget || 0;
           const dailyTarget = data?.lines[lineId - 1]?.dailyTarget || 0;
           const isBelowTarget = isProductionRow && value < hourlyTarget;
 
           // Determine cell styling based on row type and values
-          let cellStyle = "text-center py-3 px-4 font-medium";
+          let cellStyle = "text-center font-medium";
 
           if (isProductionRow) {
             cellStyle += isBelowTarget ? " text-red-600" : " text-blue-600";
@@ -93,8 +146,25 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
             cellStyle += " text-blue-800";
           }
 
+          // Determine if this cell is editable
+          const isEditable = (isDailyTargetRow || isHourlyTargetRow);
+          
+          // For editable cells, use EditableCell component
+          if (isEditable) {
+            const fieldName = isDailyTargetRow ? 'dailyTarget' as keyof LineData : 'hourlyTarget' as keyof LineData;
+            return (
+              <EditableCell 
+                value={Number(value)}
+                isEditable={true}
+                className={cellStyle}
+                onSave={(newValue) => handleCellUpdate(lineId, fieldName, newValue)}
+              />
+            );
+          }
+
+          // For non-editable cells
           return (
-            <div className={cellStyle}>
+            <div className={`${cellStyle} py-3 px-4 h-full flex flex-col justify-center`}>
               {value}
               {isActualProductionRow && dailyTarget > 0 && (
                 <div className="mt-1 bg-gray-200 h-1.5 w-full rounded-full overflow-hidden">
@@ -230,150 +300,15 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     }
   }, [data]);
 
-  const handleExportToExcel = async () => {
-    try {
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Production Data");
-
-      // Fetch and embed the logo as base64
-      try {
-        const response = await fetch(dswdLogo);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch logo: ${response.statusText}`);
-        }
-
-        const blob = await response.blob();
-
-        if (!blob.type.startsWith("image/")) {
-          throw new Error("Invalid image format");
-        }
-
-        const base64data = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            if (typeof reader.result === "string") {
-              resolve(reader.result);
-            } else {
-              reject(new Error("Failed to convert image to base64"));
-            }
-          };
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(blob);
-        });
-
-        const base64Image = base64data.split(";base64,").pop();
-        if (!base64Image) {
-          throw new Error("Invalid base64 image data");
-        }
-
-        const imageId = workbook.addImage({
-          base64: base64Image,
-          extension: "png",
-        });
-
-        worksheet.addImage(imageId, {
-          tl: { col: 0, row: 0 },
-          ext: { width: 100, height: 100 },
-        });
-      } catch (error) {
-        console.error("Failed to load DSWD logo:", error);
-        // Continue without the logo
-      }
-
-      // Add date range information if available
-      if (startDate && endDate) {
-        const dateRangeRow = worksheet.getRow(5);
-        dateRangeRow.getCell(1).value = `Date Range: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
-        dateRangeRow.font = { bold: true };
-      }
-
-      // Leave some rows for the image
-      const startRow = 8;
-
-      // Add header row with styling
-      const headerRow = worksheet.getRow(startRow);
-      headerRow.values = [
-        "METRIC",
-        ...Array.from({ length: 8 }, (_, i) => `LINE ${i + 1}`),
-        "TOTAL"
-      ];
-      headerRow.font = { bold: true };
-      headerRow.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "2563EB" }, // blue-800 to match your UI
-      };
-      headerRow.font = { color: { argb: "FFFFFF" }, bold: true };
-
-      // Add data rows with proper typing
-      if (data) {
-        rows.forEach((row, idx) => {
-          const dataRow = worksheet.getRow(startRow + 1 + idx);
-          const lineValues = data.lines.map((line) => {
-            const value = line[row.id as keyof LineData];
-            return value !== undefined ? value : 0;
-          });
-          
-          // Calculate total for the row
-          const rowTotal = lineValues.reduce((sum, val) => sum + val, 0);
-          
-          const rowValues = [
-            row.name,
-            ...lineValues,
-            rowTotal // Add total column
-          ];
-          
-          dataRow.values = rowValues;
-
-          // Style production/hr row
-          if (row.id === "productionPerHour") {
-            lineValues.forEach((value, colIdx) => {
-              if (colIdx < 8) { // Only for the 8 line columns
-                const cell = dataRow.getCell(colIdx + 2); // +2 because column 1 is the metric name
-                const hourlyTarget = data.lines[colIdx]?.hourlyTarget || 0;
-                cell.font = {
-                  color: {
-                    argb: Number(value) < hourlyTarget ? "DC2626" : "2563EB",
-                  },
-                };
-              }
-            });
-          }
-          
-          // Highlight the Actual Production total
-          if (row.id === "actualProduction") {
-            const totalCell = dataRow.getCell(10); // Column 10 is the total column
-            totalCell.font = { bold: true, color: { argb: "2563EB" } };
-            totalCell.fill = {
-              type: "pattern",
-              pattern: "solid",
-              fgColor: { argb: "EFF6FF" }, // Light blue background
-            };
-          }
-        });
-      }
-
-      // Auto-fit columns
-      worksheet.columns.forEach((column) => {
-        column.width = 15;
-      });
-
-      // Save the file
-      const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), "DSWD_Production_Data.xlsx");
-    } catch (error) {
-      console.error("Failed to export Excel file:", error);
-      // You might want to show an error message to the user here
-    }
-  };
-
   const handleSaveToCloud = async () => {
     if (!data) return;
 
     try {
       // Save to Firebase
       await firebaseService.saveProductionData(data);
+
+      // Reset unsaved changes flag
+      setHasUnsavedChanges(false);
 
       // Show success message
       Swal.fire({
@@ -405,7 +340,7 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={handleExportToExcel}
+            onClick={onExportToExcel}
             className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm"
           >
             <Download size={16} className="mr-2" />
@@ -414,7 +349,9 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
           <button
             onClick={handleSaveToCloud}
             disabled={saving}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm disabled:opacity-50"
+            className={`${
+              hasUnsavedChanges ? 'animate-pulse bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+            } text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm disabled:opacity-50`}
           >
             {saving ? (
               <>
@@ -438,12 +375,18 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
             ) : (
               <>
                 <Upload size={16} className="mr-2" />
-                Add to Cloud
+                {hasUnsavedChanges ? 'Save Changes' : 'Add to Cloud'}
               </>
             )}
           </button>
         </div>
       </div>
+
+      {hasUnsavedChanges && (
+        <div className="px-4 py-2 bg-yellow-100 text-sm text-yellow-800 border-t border-b border-yellow-200">
+          <span className="font-medium">Unsaved changes!</span> Click "Save Changes" to persist your edits.
+        </div>
+      )}
 
       {startDate && endDate && (
         <div className="px-4 py-2 bg-blue-100 text-sm text-blue-800 border-t border-b border-blue-200">
@@ -480,24 +423,15 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
                   // Apply special styling to the first cell (metric name)
                   const isMetricCell = cellIndex === 0;
 
-                  return (
-                    <td
-                      key={cell.id}
-                      className={`${isMetricCell ? "bg-blue-700 text-white" : ""
-                        }`}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  );
+                  return (                    <td                      key={cell.id}                      className={`${isMetricCell ? "bg-blue-700 text-white" : ""                        } relative h-16 min-h-[64px]`}                      style={{ padding: 0 }}                    >                      {flexRender(                        cell.column.columnDef.cell,                        cell.getContext()                      )}                    </td>                  );
                 })}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      
+      <div className="p-4 text-sm text-gray-600 bg-gray-50 border-t border-gray-200">        <p className="flex items-center">          <span className="mr-2">💡</span>          <span><strong>Tip:</strong> Click on Daily Target or Hourly Target values (with the ✏️ icon) to edit them.</span>        </p>      </div>
     </div>
   );
 };

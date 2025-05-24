@@ -151,6 +151,16 @@ const Dashboard = () => {
     );
   };
 
+  // Handle updated data from editable cells
+  const handleUpdateData = (updatedData: DashboardData) => {
+    console.log("Dashboard received updated data:", updatedData);
+    setData(updatedData);
+    // Update the timestamp to reflect the change
+    const newTimestamp = new Date().toLocaleTimeString();
+    setLastUpdated(newTimestamp);
+    console.log("Dashboard updated timestamp:", newTimestamp);
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -165,6 +175,7 @@ const Dashboard = () => {
           saving={saving}
           onExportToExcel={handleExportToExcel}
           onSaveToCloud={handleSaveToCloud}
+          onUpdateData={handleUpdateData}
         />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProductionChart data={data} />
