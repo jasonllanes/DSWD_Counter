@@ -42,9 +42,9 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
 }) => {
   // Define table structure
   const rows = [
-    { id: "dailyTarget", name: "Daily Target" },
-    { id: "hourlyTarget", name: "Hourly Target" },
-    { id: "productionPerHour", name: "Production / Hr" },
+    // { id: "dailyTarget", name: "Daily Target" },
+    // { id: "hourlyTarget", name: "Hourly Target" },
+    // { id: "productionPerHour", name: "Production / Hr" },
     { id: "actualProduction", name: "Actual Production" },
   ];
 
@@ -228,7 +228,7 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     try {
       // Save to Firebase
       await firebaseService.saveProductionData(data);
-      
+
       // Show success message
       Swal.fire({
         icon: 'success',
@@ -272,15 +272,15 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
                 <>
                   <span className="animate-spin mr-2">
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
-                      <circle 
-                        className="opacity-25" 
-                        cx="12" cy="12" r="10" 
-                        stroke="currentColor" 
+                      <circle
+                        className="opacity-25"
+                        cx="12" cy="12" r="10"
+                        stroke="currentColor"
                         strokeWidth="4"
                       />
-                      <path 
-                        className="opacity-75" 
-                        fill="currentColor" 
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                       />
                     </svg>
@@ -308,9 +308,9 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </th>
                 ))}
               </tr>
@@ -320,9 +320,8 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
             {table.getRowModel().rows.map((row, rowIndex) => (
               <tr
                 key={row.id}
-                className={`border-b border-blue-100 ${
-                  rowIndex % 2 === 0 ? "bg-white" : "bg-blue-50"
-                } hover:bg-yellow-50 transition-colors`}
+                className={`border-b border-blue-100 ${rowIndex % 2 === 0 ? "bg-white" : "bg-blue-50"
+                  } hover:bg-yellow-50 transition-colors`}
               >
                 {row.getVisibleCells().map((cell, cellIndex) => {
                   // Apply special styling to the first cell (metric name)
@@ -331,9 +330,8 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
                   return (
                     <td
                       key={cell.id}
-                      className={`${
-                        isMetricCell ? "bg-blue-700 text-white" : ""
-                      }`}
+                      className={`${isMetricCell ? "bg-blue-700 text-white" : ""
+                        }`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

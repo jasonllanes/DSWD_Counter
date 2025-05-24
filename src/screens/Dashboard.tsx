@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { fetchCurrentData } from "../services/api";
 import { saveDashboardData } from "../services/firebase";
 import { exportToExcel } from "../utils/excelExport";
@@ -10,33 +10,81 @@ import ProductionChart from "../screens/dashboard/components/ProductionChart";
 import ProductionTrends from "../screens/dashboard/components/ProductionTrends";
 import LoadingSpinner from "../screens/dashboard/components/LoadingSpinner";
 
+
+const defaultLines = Array.from({ length: 8 }, (_, idx) => ({
+  id: idx + 1,
+  dailyTarget: 1000,
+  hourlyTarget: 166,
+  productionPerHour: 150,
+  actualProduction: 0,
+}));
+
+
 const Dashboard = () => {
-  const [data, setData] = useState<DashboardData | null>(null);
+  const [data, setData] = useState<DashboardData>({
+    lines: defaultLines,
+    timestamp: new Date().toISOString(),
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>("");
+  const wsRef = useRef<WebSocket | null>(null);
+
 
   // Fetch data initially and set up interval for real-time updates
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await fetchCurrentData();
-        setData(result);
+    // Remove fetchCurrentData interval and only use WebSocket
+    setLoading(true);
+
+    // WebSocket setup for real-time sensor updates
+    wsRef.current = new WebSocket("ws://localhost:4000");
+    wsRef.current.onmessage = (event) => {
+      const msg = event.data as string;
+      // Example: "Sensor 5 triggered, Total Score: 4"
+      const match = msg.match(/Sensor (\d+) triggered, Total Score: (\d+)/);
+      if (match) {
+        const lineIdx = parseInt(match[1], 10) - 1;
+        const totalScore = parseInt(match[2], 10);
+        setData((prev) => {
+          // If no previous data, initialize with default structure
+          if (!prev) {
+            return {
+              lines: Array.from({ length: 8 }, (_, idx) => ({
+                id: idx + 1,
+                dailyTarget: 1000,
+                hourlyTarget: 166,
+                productionPerHour: 150,
+                actualProduction: idx === lineIdx ? totalScore : 0,
+              })),
+              timestamp: new Date().toISOString(),
+            };
+          }
+          const lines = prev.lines.map((line, idx) =>
+            idx === lineIdx
+              ? { ...line, actualProduction: totalScore }
+              : line
+          );
+          return { ...prev, lines, timestamp: new Date().toISOString() };
+        });
         setLastUpdated(new Date().toLocaleTimeString());
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
         setLoading(false);
       }
     };
 
-    fetchData();
+    wsRef.current.onerror = (err) => {
+      console.error("WebSocket error:", err);
+      setLoading(false);
+    };
 
-    // Set up interval for real-time updates
-    const intervalId = setInterval(fetchData, 5000); // Update every 5 seconds
+    // Fallback: stop loading after 5 seconds if no data
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
 
-    // Clean up interval on component unmount
-    return () => clearInterval(intervalId);
+    return () => {
+      wsRef.current?.close();
+      clearTimeout(timeout);
+    };
   }, []);
 
   // Calculate statistics for dashboard cards
