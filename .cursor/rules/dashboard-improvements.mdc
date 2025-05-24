@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Dashboard improvements
+
+# Improvements
+- Add a date along with the Last updated: 2:06:27 PM
+- Add Column of the Actual production 
+ - Actual Production Total will be added based on the date range ex. Day 1 to Day 3 (Actual Production Total = June 1 + June 3)  
+ 
+
+  
