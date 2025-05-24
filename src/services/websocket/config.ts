@@ -14,7 +14,7 @@ export class WebSocketService {
   private url: string;
 
   constructor(url: string) {
-    this.url = url;
+    this.url = url;   
   }
 
   connect() {
