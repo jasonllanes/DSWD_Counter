@@ -18,7 +18,6 @@ interface AppConfig {
     baseUrl: string;
   };
   features: {
-    mockData: boolean;
     analytics: boolean;
   };
 }
@@ -53,7 +52,6 @@ export const config: AppConfig = {
     baseUrl: validateEnvVar('VITE_API_BASE_URL', 'http://localhost:3000'),
   },
   features: {
-    mockData: validateEnvVar('VITE_MOCK_DATA_ENABLED', 'true') === 'true',
     analytics: validateEnvVar('VITE_ENABLE_ANALYTICS', 'false') === 'true',
   },
 };
