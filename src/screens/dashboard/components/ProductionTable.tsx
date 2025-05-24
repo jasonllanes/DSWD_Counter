@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { BarChart2, Download, Upload } from "react-feather";
+import { BarChart2, Download, Upload, Calendar } from "react-feather";
 import type { DashboardData, DashboardRowData } from "../../../types";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
@@ -13,6 +13,7 @@ import dswdLogo from "../../../assets/dswd_logo.png";
 import { firebaseService } from "@/services/firebase";
 import { isFeatureEnabled } from "@/config/env";
 import Swal from "sweetalert2";
+import DateRangePicker from "./DateRangePicker";
 
 type ProductionTableProps = {
   data: DashboardData | null;
@@ -40,6 +41,9 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
   onExportToExcel,
   onSaveToCloud,
 }) => {
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
   // Define table structure
   const rows = [
     { id: "dailyTarget", name: "Daily Target" },
@@ -89,6 +93,34 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         },
       })
     ),
+    // Add Total Column
+    columnHelper.accessor("total", {
+      header: () => (
+        <div className="text-center font-medium text-white py-3 px-4 bg-blue-900">
+          TOTAL
+        </div>
+      ),
+      cell: (info) => {
+        const row = info.row.original;
+        const isActualProductionRow = row.metric === "Actual Production";
+        
+        // Calculate total for this row by summing all line values
+        let total = 0;
+        for (let i = 1; i <= 8; i++) {
+          const lineValue = row[`line${i}`] as number || 0;
+          total += lineValue;
+        }
+
+        // Different styling for Actual Production total
+        const cellStyle = `text-center py-3 px-4 font-medium ${
+          isActualProductionRow 
+            ? "text-blue-600 font-bold bg-blue-50" 
+            : "text-blue-800 bg-gray-50"
+        }`;
+
+        return <div className={cellStyle}>{total.toLocaleString()}</div>;
+      },
+    }),
   ];
 
   // Transform data for the table
@@ -109,6 +141,42 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  const handleDateChange = useCallback((start: Date | null, end: Date | null) => {
+    setStartDate(start);
+    setEndDate(end);
+    
+    // If both dates are selected, show total production for the range
+    if (start && end && data) {
+      // In a real application, you would fetch data for this date range from your backend
+      // For now, we'll just display the current data with a message about the date range
+      const totalProduction = data.lines.reduce(
+        (sum, line) => sum + line.actualProduction, 
+        0
+      );
+      
+      const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      };
+      
+      Swal.fire({
+        title: 'Total Production',
+        html: `
+          <div class="text-left">
+            <p class="mb-3">Total for ${formatDate(start)} - ${formatDate(end)}:</p>
+            <p class="text-3xl font-bold text-blue-600">${totalProduction.toLocaleString()}</p>
+            <p class="mt-4 text-sm text-gray-600">Note: In a real application, this would show historical data for the selected date range.</p>
+          </div>
+        `,
+        icon: 'info',
+        confirmButtonColor: '#3B82F6'
+      });
+    }
+  }, [data]);
 
   const handleExportToExcel = async () => {
     try {
@@ -161,6 +229,13 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         // Continue without the logo
       }
 
+      // Add date range information if available
+      if (startDate && endDate) {
+        const dateRangeRow = worksheet.getRow(5);
+        dateRangeRow.getCell(1).value = `Date Range: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+        dateRangeRow.font = { bold: true };
+      }
+
       // Leave some rows for the image
       const startRow = 8;
 
@@ -169,6 +244,7 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
       headerRow.values = [
         "METRIC",
         ...Array.from({ length: 8 }, (_, i) => `LINE ${i + 1}`),
+        "TOTAL"
       ];
       headerRow.font = { bold: true };
       headerRow.fill = {
@@ -182,21 +258,28 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
       if (data) {
         rows.forEach((row, idx) => {
           const dataRow = worksheet.getRow(startRow + 1 + idx);
+          const lineValues = data.lines.map((line) => {
+            const value = line[row.id as keyof LineData];
+            return value !== undefined ? value : 0;
+          });
+          
+          // Calculate total for the row
+          const rowTotal = lineValues.reduce((sum, val) => sum + val, 0);
+          
           const rowValues = [
             row.name,
-            ...data.lines.map((line) => {
-              const value = line[row.id as keyof LineData];
-              return value !== undefined ? value : 0;
-            }),
+            ...lineValues,
+            rowTotal // Add total column
           ];
+          
           dataRow.values = rowValues;
 
           // Style production/hr row
           if (row.id === "productionPerHour") {
-            rowValues.forEach((value, colIdx) => {
-              if (colIdx > 0) {
-                const cell = dataRow.getCell(colIdx + 1);
-                const hourlyTarget = data.lines[colIdx - 1]?.hourlyTarget || 0;
+            lineValues.forEach((value, colIdx) => {
+              if (colIdx < 8) { // Only for the 8 line columns
+                const cell = dataRow.getCell(colIdx + 2); // +2 because column 1 is the metric name
+                const hourlyTarget = data.lines[colIdx]?.hourlyTarget || 0;
                 cell.font = {
                   color: {
                     argb: Number(value) < hourlyTarget ? "DC2626" : "2563EB",
@@ -204,6 +287,17 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
                 };
               }
             });
+          }
+          
+          // Highlight the Actual Production total
+          if (row.id === "actualProduction") {
+            const totalCell = dataRow.getCell(10); // Column 10 is the total column
+            totalCell.font = { bold: true, color: { argb: "2563EB" } };
+            totalCell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "EFF6FF" }, // Light blue background
+            };
           }
         });
       }
@@ -250,10 +344,13 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
   return (
     <div className="w-full bg-white rounded-lg shadow-xl overflow-hidden mb-6 border border-blue-200">
       <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-blue-50">
-        <h2 className="text-lg font-medium text-blue-800 flex items-center">
-          <BarChart2 size={18} className="mr-2" />
-          Production Metrics
-        </h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <h2 className="text-lg font-medium text-blue-800 flex items-center">
+            <BarChart2 size={18} className="mr-2" />
+            Production Metrics
+          </h2>
+          <DateRangePicker onDateChange={handleDateChange} />
+        </div>
         <div className="flex space-x-3">
           <button
             onClick={handleExportToExcel}
@@ -295,6 +392,12 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
           </button>
         </div>
       </div>
+
+      {startDate && endDate && (
+        <div className="px-4 py-2 bg-blue-100 text-sm text-blue-800 border-t border-b border-blue-200">
+          <span className="font-medium">Selected Date Range:</span> {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
+        </div>
+      )}
 
       <div className="w-full overflow-x-auto">
         <table className="w-full border-collapse">
