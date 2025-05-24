@@ -74,10 +74,12 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         ),
         cell: (info) => {
           const value = info.getValue();
+          const row = info.row.original;
           // Determine if production is below target
-          const isProductionRow =
-            info.row.original.metric === "Production / Hr";
+          const isProductionRow = row.metric === "Production / Hr";
+          const isActualProductionRow = row.metric === "Actual Production";
           const hourlyTarget = data?.lines[lineId - 1]?.hourlyTarget || 0;
+          const dailyTarget = data?.lines[lineId - 1]?.dailyTarget || 0;
           const isBelowTarget = isProductionRow && value < hourlyTarget;
 
           // Determine cell styling based on row type and values
@@ -85,24 +87,41 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
 
           if (isProductionRow) {
             cellStyle += isBelowTarget ? " text-red-600" : " text-blue-600";
+          } else if (isActualProductionRow) {
+            cellStyle += " text-blue-600";
           } else {
             cellStyle += " text-blue-800";
           }
 
-          return <div className={cellStyle}>{value}</div>;
+          return (
+            <div className={cellStyle}>
+              {value}
+              {isActualProductionRow && dailyTarget > 0 && (
+                <div className="mt-1 bg-gray-200 h-1.5 w-full rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full ${Number(value) >= dailyTarget ? 'bg-green-500' : 'bg-blue-500'}`}
+                    style={{ 
+                      width: `${Math.min(100, Math.round((Number(value) / dailyTarget) * 100))}%` 
+                    }}
+                  ></div>
+                </div>
+              )}
+            </div>
+          );
         },
       })
     ),
     // Add Total Column
     columnHelper.accessor("total", {
       header: () => (
-        <div className="text-center font-medium text-white py-3 px-4 bg-blue-900">
-          TOTAL
+        <div className="text-center font-medium text-white py-3 px-4 bg-blue-900 flex items-center justify-center">
+          <span className="mr-1">∑</span> TOTAL
         </div>
       ),
       cell: (info) => {
         const row = info.row.original;
         const isActualProductionRow = row.metric === "Actual Production";
+        const isDailyTargetRow = row.metric === "Daily Target";
         
         // Calculate total for this row by summing all line values
         let total = 0;
@@ -111,14 +130,47 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
           total += lineValue;
         }
 
-        // Different styling for Actual Production total
-        const cellStyle = `text-center py-3 px-4 font-medium ${
+        // Different styling for each row type
+        const cellStyle = `text-center py-3 px-4 font-medium border-l-2 border-blue-200 ${
           isActualProductionRow 
             ? "text-blue-600 font-bold bg-blue-50" 
-            : "text-blue-800 bg-gray-50"
+            : isDailyTargetRow
+              ? "text-blue-800 bg-yellow-50"
+              : "text-blue-800 bg-gray-50"
         }`;
 
-        return <div className={cellStyle}>{total.toLocaleString()}</div>;
+        // Calculate progress for actual production
+        let progressBar = null;
+        if (isActualProductionRow) {
+          // Find the total daily target from the table data
+          const dailyTargetRow = tableData.find(r => r.metric === "Daily Target");
+          let totalDailyTarget = 0;
+          
+          if (dailyTargetRow) {
+            for (let i = 1; i <= 8; i++) {
+              totalDailyTarget += (dailyTargetRow[`line${i}`] as number) || 0;
+            }
+          }
+          
+          if (totalDailyTarget > 0) {
+            const percentage = Math.min(100, Math.round((total / totalDailyTarget) * 100));
+            progressBar = (
+              <div className="mt-1 bg-gray-200 h-1.5 w-full rounded-full overflow-hidden">
+                <div 
+                  className="bg-blue-600 h-full rounded-full" 
+                  style={{ width: `${percentage}%` }}
+                ></div>
+              </div>
+            );
+          }
+        }
+
+        return (
+          <div className={cellStyle}>
+            {total.toLocaleString()}
+            {progressBar}
+          </div>
+        );
       },
     }),
   ];
