@@ -3,13 +3,12 @@ import { fetchCurrentData } from "../services/api";
 import { saveDashboardData } from "../services/firebase";
 import { exportToExcel } from "../utils/excelExport";
 import type { DashboardData } from "../types";
-import DashboardHeader from "../screens/dashboard/components/DashboardHeader";
-import ProductionTable from "../screens/dashboard/components/ProductionTable";
-import StatisticsCards from "../screens/dashboard/components/StatisticCard";
-import ProductionChart from "../screens/dashboard/components/ProductionChart";
-import ProductionTrends from "../screens/dashboard/components/ProductionTrends";
-import LoadingSpinner from "../screens/dashboard/components/LoadingSpinner";
-
+import DashboardHeader from "./dashboard/components/DashboardHeader";
+import ProductionTable from "./dashboard/components/ProductionTable";
+import StatisticsCards from "./dashboard/components/StatisticCard";
+import ProductionChart from "./dashboard/components/ProductionChart";
+import ProductionTrends from "./dashboard/components/ProductionTrends";
+import LoadingSpinner from "./dashboard/components/LoadingSpinner";
 
 const defaultLines = Array.from({ length: 8 }, (_, idx) => ({
   id: idx + 1,
@@ -18,7 +17,6 @@ const defaultLines = Array.from({ length: 8 }, (_, idx) => ({
   productionPerHour: 150,
   actualProduction: 0,
 }));
-
 
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData>({
@@ -30,10 +28,8 @@ const Dashboard = () => {
   const [lastUpdated, setLastUpdated] = useState<string>("");
   const wsRef = useRef<WebSocket | null>(null);
 
-
   // Fetch data initially and set up interval for real-time updates
   useEffect(() => {
-    // Remove fetchCurrentData interval and only use WebSocket
     setLoading(true);
 
     // WebSocket setup for real-time sensor updates
@@ -46,7 +42,6 @@ const Dashboard = () => {
         const lineIdx = parseInt(match[1], 10) - 1;
         const totalScore = parseInt(match[2], 10);
         setData((prev) => {
-          // If no previous data, initialize with default structure
           if (!prev) {
             return {
               lines: Array.from({ length: 8 }, (_, idx) => ({
@@ -161,25 +156,21 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen w-full text-blue-800 pt-20">
+    <div className="min-h-screen bg-gray-50">
       <DashboardHeader lastUpdated={lastUpdated} />
-
-      <div className="w-full px-6 py-6">
-        <StatisticsCards statistics={statistics} />
+      <main className="container mx-auto px-4 py-6">
+        <StatisticsCards data={data} />
         <ProductionTable
           data={data}
           saving={saving}
           onExportToExcel={handleExportToExcel}
           onSaveToCloud={handleSaveToCloud}
         />
-
-
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ProductionChart data={data} />
           <ProductionTrends />
-          <ProductionChart />
         </div>
-      </div>
+      </main>
     </div>
   );
 };

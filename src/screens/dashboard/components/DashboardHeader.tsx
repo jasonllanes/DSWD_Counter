@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, RefreshCw } from "react-feather";
+import { Clock, RefreshCw, Calendar } from "react-feather";
 import dswd_logo from "../../../assets/dswd_logo.png";
 
 type DashboardHeaderProps = {
@@ -7,28 +7,43 @@ type DashboardHeaderProps = {
 };
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ lastUpdated }) => {
+    const currentDate = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    });
+
     return (
-        <div className="w-full bg-blue-800 py-4 border-b border-blue-900 shadow-md">
-            <div className="flex flex-col md:flex-row justify-between  gap-2 container mx-2 md:mx-2 lg:mx-2">
-                <div className="flex items-center">
+        <header className="bg-[#2B45A3] w-full">
+            <div className="container mx-auto flex flex-col items-center justify-center py-4 text-center">
+                <div className="flex items-center gap-2 mb-2">
                     <img
                         src={dswd_logo}
                         alt="DSWD Logo"
-                        className="h-10 mr-3"
+                        className="h-8 w-8"
                     />
-                    <h1 className="text-xl font-bold text-white">
+                    <h1 className="text-white text-xl font-semibold">
                         DSWD Relief Dashboard
                     </h1>
                 </div>
-                <div className="flex items-center text-yellow-300 text-sm">
-                    <Clock size={14} className="mr-2" />
-                    <span>Last updated: {lastUpdated}</span>
-                    <span className="mx-2">•</span>
-                    <RefreshCw size={14} className="mr-2" />
-                    <span>Auto-refreshes every 5 seconds</span>
+                
+                <div className="flex flex-col items-center gap-1 text-yellow-300 text-sm">
+                    <div className="flex items-center">
+                        <Calendar size={14} className="mr-1.5" />
+                        <span>{currentDate}</span>
+                    </div>
+                    <div className="flex items-center">
+                        <Clock size={14} className="mr-1.5" />
+                        <span>Last updated: {lastUpdated}</span>
+                    </div>
+                    <div className="flex items-center">
+                        <RefreshCw size={14} className="mr-1.5" />
+                        <span>Auto-refreshes every 5 seconds</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </header>
     );
 };
 
