@@ -24,7 +24,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ lastUpdated }) => {
                         className="h-8 w-8"
                     />
                     <h1 className="text-white text-xl font-semibold">
-                        DSWD Relief Dashboard
+                        DSWD Cebu Relief Dashboard
                     </h1>
                 </div>
                 
