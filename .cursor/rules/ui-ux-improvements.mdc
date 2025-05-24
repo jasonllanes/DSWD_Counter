@@ -1,0 +1,225 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# UI/UX Improvements Rule
+
+## Loading States and Feedback
+- Implement loading spinners for all async operations
+- Add smooth transitions between states
+- Show progress indicators for long-running tasks
+- Provide clear feedback for user actions
+
+### Cloud Upload Loading State 
+```tsx
+// ProductionTable.tsx - Cloud Upload Button
+<button
+  onClick={handleSaveToCloud}
+  disabled={saving}
+  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm disabled:opacity-50"
+>
+  {saving ? (
+    <>
+      <span className="animate-spin mr-2">
+        <svg className="w-4 h-4" viewBox="0 0 24 24">
+          <circle 
+            className="opacity-25" 
+            cx="12" cy="12" r="10" 
+            stroke="currentColor" 
+            strokeWidth="4"
+          />
+          <path 
+            className="opacity-75" 
+            fill="currentColor" 
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
+        </svg>
+      </span>
+      Saving...
+    </>
+  ) : (
+    <>
+      <Upload size={16} className="mr-2" />
+      Add to Cloud
+    </>
+  )}
+</button>
+```
+
+## Interactive Feedback
+- Add hover states for interactive elements
+- Implement micro-interactions for better engagement
+- Use tooltips for additional information
+- Show confirmation dialogs for important actions
+
+### Example Implementations
+```tsx
+// Tooltip Component
+<Tooltip content="Save current production data to cloud storage">
+  <button>Add to Cloud</button>
+</Tooltip>
+
+// Confirmation Dialog
+const handleSaveToCloud = async () => {
+  const willSave = await Swal.fire({
+    title: 'Save Production Data?',
+    text: 'This will store the current production metrics in the cloud',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, save it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#2563eb',
+  });
+
+  if (willSave.isConfirmed) {
+    // Proceed with save
+  }
+};
+```
+
+## Error Handling
+- Show clear error messages
+- Provide recovery options
+- Maintain data consistency during errors
+- Log errors for debugging
+
+```tsx
+// Error Boundary Component
+<ErrorBoundary
+  fallback={({ error, resetError }) => (
+    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <h3 className="text-red-800">Something went wrong</h3>
+      <p className="text-red-600">{error.message}</p>
+      <button onClick={resetError}>Try Again</button>
+    </div>
+  )}
+>
+  <Component />
+</ErrorBoundary>
+```
+
+## Accessibility Improvements
+- Add ARIA labels for interactive elements
+- Ensure keyboard navigation
+- Maintain proper color contrast
+- Support screen readers
+
+```tsx
+// Accessible Button Example
+<button
+  aria-label="Save production data to cloud storage"
+  role="button"
+  tabIndex={0}
+  className="focus:ring-2 focus:ring-blue-500 focus:outline-none"
+>
+  Add to Cloud
+</button>
+```
+
+## Performance Optimizations
+- Implement lazy loading for components
+- Use skeleton loaders for content
+- Optimize animations for performance
+- Cache frequently accessed data
+
+```tsx
+// Skeleton Loader
+const TableSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="h-10 bg-gray-200 rounded mb-4" />
+    <div className="space-y-3">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="h-8 bg-gray-200 rounded" />
+      ))}
+    </div>
+  </div>
+);
+```
+
+## Mobile Responsiveness
+- Ensure fluid layouts across devices
+- Optimize touch targets for mobile
+- Implement mobile-specific interactions
+- Use appropriate font sizes
+
+```tsx
+// Responsive Design Classes
+<div className="
+  text-sm md:text-base 
+  p-2 md:p-4
+  space-y-2 md:space-y-4
+">
+  {/* Content */}
+</div>
+```
+
+## Data Visualization
+- Use clear and consistent charts
+- Add interactive data points
+- Implement responsive visualizations
+- Provide data export options
+
+```tsx
+// Chart Wrapper Component
+const ChartWrapper = ({ children }) => (
+  <div className="
+    w-full 
+    overflow-hidden 
+    rounded-lg 
+    shadow-lg
+    bg-white
+    p-4
+  ">
+    <div className="h-[400px]">{children}</div>
+  </div>
+);
+```
+
+## Form Handling
+- Show validation feedback in real-time
+- Maintain form state during errors
+- Auto-save form data when appropriate
+- Provide clear submission feedback
+
+```tsx
+// Form Feedback Component
+const FormFeedback = ({ status, message }) => (
+  <div className={`
+    mt-2 text-sm
+    ${status === 'error' ? 'text-red-600' : 'text-green-600'}
+  `}>
+    {message}
+  </div>
+);
+```
+
+## Navigation and Routing
+- Implement smooth page transitions
+- Show loading states during navigation
+- Maintain scroll position
+- Handle deep linking
+
+```tsx
+// Page Transition Wrapper
+const PageTransition = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.3 }}
+  >
+    {children}
+  </motion.div>
+);
+```
+
+## Best Practices
+1. Always provide visual feedback for user actions
+2. Maintain consistent design language
+3. Optimize for both desktop and mobile
+4. Ensure accessibility compliance
+5. Test with real users when possible
+6. Monitor performance metrics
+7. Document UI/UX decisions
+8. Regular usability testing

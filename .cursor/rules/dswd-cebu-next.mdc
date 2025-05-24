@@ -15,7 +15,7 @@ Real-time production monitoring dashboard for DSWD Relief Counter System, tracki
 - Data Management: TanStack Table
 - Visualizations: Recharts
 - Real-time: Next.js WebSocket API Routes (Arduino Integration)
-- Cloud: Firebase Firestore
+- Cloud: Firebase Firestore 
 - Reporting: ExcelJS
 
 ## Project Structure
