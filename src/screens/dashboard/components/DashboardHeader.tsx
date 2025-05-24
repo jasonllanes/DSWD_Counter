@@ -16,7 +16,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ lastUpdated }) => {
 
     return (
         <header className="bg-[#2B45A3] w-full">
-            <div className="container mx-auto flex flex-col items-center justify-center py-4 text-center">
+            <div className="container mx-auto flex flex-col items-start justify-center py-4">
                 <div className="flex items-center gap-2 mb-2">
                     <img
                         src={dswd_logo}
@@ -28,16 +28,16 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ lastUpdated }) => {
                     </h1>
                 </div>
                 
-                <div className="flex flex-col items-center gap-1 text-yellow-300 text-sm">
-                    <div className="flex items-center">
+                <div className="flex flex-col  gap-1 text-yellow-300 text-sm">
+                    <div className="flex ">
                         <Calendar size={14} className="mr-1.5" />
                         <span>{currentDate}</span>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex ">
                         <Clock size={14} className="mr-1.5" />
                         <span>Last updated: {lastUpdated}</span>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex ">
                         <RefreshCw size={14} className="mr-1.5" />
                         <span>Auto-refreshes every 5 seconds</span>
                     </div>
