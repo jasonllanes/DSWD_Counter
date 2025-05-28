@@ -15,6 +15,7 @@ import { isFeatureEnabled } from "@/config/env";
 import Swal from "sweetalert2";
 import DateRangePicker from "./DateRangePicker";
 import EditableCell from "./EditableCell";
+import { useTableEditing } from '@/hooks/useTableEditing';
 
 type ProductionTableProps = {
   data: DashboardData | null;
@@ -46,7 +47,71 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const {
+    data: tableData,
+    hasUnsavedChanges,
+    handleCellUpdate,
+    saveChanges,
+    discardChanges
+  } = useTableEditing({
+    initialData: data,
+    onUpdateData
+  });
+
+  // Add getCellClassName helper function
+  const getCellClassName = (info: any) => {
+    const row = info.row.original;
+    const value = info.getValue();
+    
+    let className = "text-center font-medium";
+    
+    if (row.metric === "Production / Hr") {
+      const hourlyTarget = tableData?.lines[info.column.id - 1]?.hourlyTarget || 0;
+      className += value < hourlyTarget ? " text-red-600" : " text-blue-600";
+    } else if (row.metric === "Actual Production") {
+      className += " text-blue-600";
+    } else {
+      className += " text-blue-800";
+    }
+    
+    return className;
+  };
+
+  // Transform data for the table
+  const transformedData: DashboardRowData[] = React.useMemo(() => {
+    if (!tableData) return [];
+
+    return [
+      {
+        metric: "Daily Target",
+        ...tableData.lines.reduce((acc, line) => ({
+          ...acc,
+          [`line${line.id}`]: line.dailyTarget
+        }), {})
+      },
+      {
+        metric: "Hourly Target",
+        ...tableData.lines.reduce((acc, line) => ({
+          ...acc,
+          [`line${line.id}`]: line.hourlyTarget
+        }), {})
+      },
+      {
+        metric: "Production / Hr",
+        ...tableData.lines.reduce((acc, line) => ({
+          ...acc,
+          [`line${line.id}`]: line.productionPerHour
+        }), {})
+      },
+      {
+        metric: "Actual Production",
+        ...tableData.lines.reduce((acc, line) => ({
+          ...acc,
+          [`line${line.id}`]: line.actualProduction
+        }), {})
+      }
+    ];
+  }, [tableData]);
 
   // Define table structure
   const rows = [
@@ -55,53 +120,6 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     { id: "productionPerHour", name: "Production / Hr", isEditable: false },
     { id: "actualProduction", name: "Actual Production", isEditable: false },
   ];
-
-  // Handle cell value updates  
-  const handleCellUpdate = (lineId: number, field: keyof LineData, newValue: number) => {
-    if (!data) return;
-
-    console.log(`Updating ${field} for Line ${lineId} to ${newValue}`);
-
-    // Create a deep copy of the data
-    const updatedData: DashboardData = {
-      ...data,
-      lines: data.lines.map((line) => {
-        if (line.id === lineId) {
-          // If we're updating hourlyTarget, calculate productionPerHour
-          if (field === 'hourlyTarget') {
-            return {
-              ...line,
-              [field]: newValue,
-              // Update production per hour based on actual production
-              productionPerHour: Math.round(line.actualProduction / (newValue > 0 ? newValue : 1))
-            };
-          }
-          // Just update the field otherwise
-          return { ...line, [field]: newValue };
-        }
-        return { ...line };
-      })
-    };
-
-    console.log("Updated data:", updatedData);
-
-    // Update state to show there are unsaved changes
-    setHasUnsavedChanges(true);
-    
-    // Call the parent component's update function
-    onUpdateData(updatedData);
-    
-    // Show a small toast notification
-    Swal.fire({
-      title: 'Value Updated',
-      text: `${field === 'dailyTarget' ? 'Daily' : 'Hourly'} target for Line ${lineId} updated to ${newValue}`,
-      icon: 'success',
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 3000
-    });
-  };
 
   const columnHelper = createColumnHelper<DashboardRowData>();
 
@@ -126,54 +144,58 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         cell: (info) => {
           const value = info.getValue();
           const row = info.row.original;
-          // Determine if production is below target
-          const isProductionRow = row.metric === "Production / Hr";
-          const isActualProductionRow = row.metric === "Actual Production";
           const isDailyTargetRow = row.metric === "Daily Target";
           const isHourlyTargetRow = row.metric === "Hourly Target";
-          const hourlyTarget = data?.lines[lineId - 1]?.hourlyTarget || 0;
-          const dailyTarget = data?.lines[lineId - 1]?.dailyTarget || 0;
-          const isBelowTarget = isProductionRow && value < hourlyTarget;
+          const isEditable = isDailyTargetRow || isHourlyTargetRow;
 
-          // Determine cell styling based on row type and values
-          let cellStyle = "text-center font-medium";
-
-          if (isProductionRow) {
-            cellStyle += isBelowTarget ? " text-red-600" : " text-blue-600";
-          } else if (isActualProductionRow) {
-            cellStyle += " text-blue-600";
-          } else {
-            cellStyle += " text-blue-800";
-          }
-
-          // Determine if this cell is editable
-          const isEditable = (isDailyTargetRow || isHourlyTargetRow);
-          
-          // For editable cells, use EditableCell component
           if (isEditable) {
             const fieldName = isDailyTargetRow ? 'dailyTarget' as keyof LineData : 'hourlyTarget' as keyof LineData;
             return (
               <EditableCell 
                 value={Number(value)}
                 isEditable={true}
-                className={cellStyle}
-                onSave={(newValue) => handleCellUpdate(lineId, fieldName, newValue)}
+                className={getCellClassName(info)}
+                onSave={(newValue) => {
+                  handleCellUpdate(lineId, fieldName, newValue);
+                  // Show success toast
+                  Swal.fire({
+                    title: 'Value Updated',
+                    text: `${fieldName === 'dailyTarget' ? 'Daily' : 'Hourly'} target for Line ${lineId} updated to ${newValue}`,
+                    icon: 'success',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                  });
+                }}
               />
             );
           }
 
+          // Determine cell styling based on row type and values
+          let cellStyle = "text-center font-medium";
+
+          if (row.metric === "Production / Hr") {
+            cellStyle += " text-blue-600";
+          } else if (row.metric === "Actual Production") {
+            cellStyle += " text-blue-600";
+          } else {
+            cellStyle += " text-blue-800";
+          }
+
           // For non-editable cells
+          const dailyTarget = tableData?.lines?.[lineId - 1]?.dailyTarget ?? 0;
           return (
             <div className={`${cellStyle} py-3 px-4 h-full flex flex-col justify-center`}>
               {value}
-              {isActualProductionRow && dailyTarget > 0 && (
+              {row.metric === "Actual Production" && dailyTarget > 0 && (
                 <div className="mt-1 bg-gray-200 h-1.5 w-full rounded-full overflow-hidden">
                   <div 
                     className={`h-full rounded-full ${Number(value) >= dailyTarget ? 'bg-green-500' : 'bg-blue-500'}`}
                     style={{ 
                       width: `${Math.min(100, Math.round((Number(value) / dailyTarget) * 100))}%` 
                     }}
-                  ></div>
+                  />
                 </div>
               )}
             </div>
@@ -213,7 +235,7 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         let progressBar = null;
         if (isActualProductionRow) {
           // Find the total daily target from the table data
-          const dailyTargetRow = tableData.find(r => r.metric === "Daily Target");
+          const dailyTargetRow = transformedData.find(r => r.metric === "Daily Target");
           let totalDailyTarget = 0;
           
           if (dailyTargetRow) {
@@ -245,21 +267,8 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     }),
   ];
 
-  // Transform data for the table
-  const tableData: DashboardRowData[] = rows.map((row) => {
-    const rowData: DashboardRowData = { metric: row.name };
-
-    if (data) {
-      data.lines.forEach((line) => {
-        rowData[`line${line.id}`] = line[row.id as keyof typeof line];
-      });
-    }
-
-    return rowData;
-  });
-
   const table = useReactTable({
-    data: tableData,
+    data: transformedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -301,16 +310,11 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
   }, [data]);
 
   const handleSaveToCloud = async () => {
-    if (!data) return;
+    if (!transformedData) return;
 
     try {
-      // Save to Firebase
-      await firebaseService.saveProductionData(data);
-
-      // Reset unsaved changes flag
-      setHasUnsavedChanges(false);
-
-      // Show success message
+      await onSaveToCloud();
+      saveChanges(); // Use the hook's saveChanges
       Swal.fire({
         icon: 'success',
         title: 'Data Saved!',
@@ -500,43 +504,24 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         <div className="flex space-x-3">
           <button
             onClick={handleExportToExcel}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center"
           >
             <Download size={16} className="mr-2" />
-            Export to Excel
+            Export Excel
           </button>
+          
           <button
             onClick={handleSaveToCloud}
-            disabled={saving}
-            className={`${
-              hasUnsavedChanges ? 'animate-pulse bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
-            } text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm disabled:opacity-50`}
+            disabled={saving || !hasUnsavedChanges}
+            className={`
+              bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md 
+              flex items-center transition-all
+              ${hasUnsavedChanges ? 'animate-pulse' : ''}
+              disabled:opacity-50
+            `}
           >
-            {saving ? (
-              <>
-                <span className="animate-spin mr-2">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <circle 
-                      className="opacity-25" 
-                      cx="12" cy="12" r="10" 
-                      stroke="currentColor" 
-                      strokeWidth="4"
-                    />
-                    <path 
-                      className="opacity-75" 
-                      fill="currentColor" 
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
-                  </svg>
-                </span>
-                Saving...
-              </>
-            ) : (
-              <>
-                <Upload size={16} className="mr-2" />
-                {hasUnsavedChanges ? 'Save Changes' : 'Add to Cloud'}
-              </>
-            )}
+            <Upload size={16} className="mr-2" />
+            {saving ? 'Saving...' : 'Save to Cloud'}
           </button>
         </div>
       </div>
@@ -590,7 +575,7 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         </table>
       </div>
       
-      <div className="p-4 text-sm text-gray-600 bg-gray-50 border-t border-gray-200">        <p className="flex items-center">          <span className="mr-2">💡</span>          <span><strong>Tip:</strong> Click on Daily Target or Hourly Target values (with the ✏️ icon) to edit them.</span>        </p>      </div>
+      <div className="p-4 text-sm text-gray-600 bg-gray-50 border-t border-gray-200">        <p className="flex items-center">          <span className="mr-2">💡</span>          <span><strong>Tip:</strong> Click on Daily Target or Hourly Target values to edit them.</span>        </p>      </div>
     </div>
   );
 };
