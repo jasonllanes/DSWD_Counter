@@ -328,6 +328,165 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     }
   };
 
+  // Add Excel export functionality
+  const handleExportToExcel = async () => {
+    if (!data) return;
+
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Production Data');
+
+      // Convert image to base64 if it's not already
+      const response = await fetch(dswdLogo);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      
+      reader.onload = async () => {
+        try {
+          const base64Logo = reader.result as string;
+          
+          // Add logo
+          const logoId = workbook.addImage({
+            base64: base64Logo.split(',')[1],
+            extension: 'png',
+          });
+
+          // Configure worksheet
+          worksheet.properties.defaultRowHeight = 15;
+          
+          // Add logo
+          worksheet.addImage(logoId, {
+            tl: { col: 0, row: 0 },
+            ext: { width: 80, height: 80 }
+          });
+
+          // Set row height for logo
+          worksheet.getRow(1).height = 60;
+          
+          // Add spacing after logo
+          for (let i = 0; i < 4; i++) {
+            worksheet.addRow([]);
+          }
+
+          // Add title row with company name
+          const titleRow = worksheet.addRow(['DSWD Production Data Report']);
+          titleRow.font = {
+            bold: true,
+            size: 16
+          };
+          titleRow.alignment = {
+            vertical: 'middle',
+            horizontal: 'center'
+          };
+          worksheet.mergeCells(titleRow.number, 1, titleRow.number, 10);
+
+          // Add date
+          const dateRow = worksheet.addRow([`Report Generated: ${new Date().toLocaleDateString()}`]);
+          dateRow.font = { size: 10 };
+          dateRow.alignment = { horizontal: 'center' };
+          worksheet.mergeCells(dateRow.number, 1, dateRow.number, 10);
+
+          // Add empty row before headers
+          worksheet.addRow([]);
+
+          // Add headers with styling
+          const headers = ['Metric', ...Array.from({ length: 8 }, (_, i) => `Line ${i + 1}`), 'Total'];
+          const headerRow = worksheet.addRow(headers);
+
+          // Style headers
+          headerRow.eachCell((cell) => {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: '2563EB' } // blue-600
+            };
+            cell.font = {
+              color: { argb: 'FFFFFF' },
+              bold: true
+            };
+            cell.alignment = {
+              vertical: 'middle',
+              horizontal: 'center'
+            };
+          });
+
+          // Add data rows with styling
+          rows.forEach((row) => {
+            const rowData = [row.name];
+            data.lines.forEach((line) => {
+              rowData.push(String(line[row.id as keyof typeof line]));
+            });
+
+            // Calculate total
+            const total = rowData.slice(1).reduce((sum, val) => sum + (Number(val) || 0), 0);
+            rowData.push(String(total));
+
+            const excelRow = worksheet.addRow(rowData);
+
+            // Style data cells
+            excelRow.eachCell((cell, colNumber) => {
+              cell.alignment = {
+                vertical: 'middle',
+                horizontal: colNumber === 1 ? 'left' : 'center'
+              };
+
+              // Add specific styling based on row type
+              if (row.id === 'actualProduction') {
+                cell.font = {
+                  color: { argb: '2563EB' }, // blue-600
+                  bold: true
+                };
+              }
+
+              // Add borders
+              cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+              };
+            });
+          });
+
+          // Auto-fit columns
+          worksheet.columns.forEach(column => {
+            column.width = 15;
+          });
+
+          // Generate and save file
+          const buffer = await workbook.xlsx.writeBuffer();
+          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          saveAs(blob, `production_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+          // Show success message
+          Swal.fire({
+            icon: 'success',
+            title: 'Export Complete',
+            text: 'The production data has been exported to Excel.',
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } catch (error) {
+          console.error('Error generating Excel file:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Export Failed',
+            text: 'Failed to generate Excel file. Please try again.',
+          });
+        }
+      };
+
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error('Error in export process:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Export Failed',
+        text: 'Failed to export data. Please try again.',
+      });
+    }
+  };
+
   return (
     <div className="w-full bg-white rounded-lg shadow-xl overflow-hidden mb-6 border border-blue-200">
       <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-blue-50">
@@ -340,7 +499,7 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={onExportToExcel}
+            onClick={handleExportToExcel}
             className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center transition-colors text-sm"
           >
             <Download size={16} className="mr-2" />
