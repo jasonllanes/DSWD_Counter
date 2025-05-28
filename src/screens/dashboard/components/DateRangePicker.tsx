@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Calendar } from 'react-feather';
 
 interface DateRangePickerProps {
-  onDateChange: (startDate: Date | null, endDate: Date | null) => void;
+  onDateChange: (startDate: Date | null, endDate: Date | null, isUserSelection?: boolean) => void;
 }
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({ onDateChange }) => {
@@ -22,23 +22,20 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ onDateChange }) => {
       
       if (!isNaN(parsedStartDate.getTime()) && !isNaN(parsedEndDate.getTime())) {
         setDateRange([parsedStartDate, parsedEndDate]);
-        onDateChange(parsedStartDate, parsedEndDate);
+        onDateChange(parsedStartDate, parsedEndDate, false); // false indicates not a user selection
       }
     }
-  }, [onDateChange]);
+  }, []); // Remove onDateChange from dependencies
 
-  // Update localStorage and call the onDateChange callback when date range changes
+  // Update localStorage when date range changes
   useEffect(() => {
     if (startDate) {
       localStorage.setItem('dashboardStartDate', startDate.toISOString());
     }
-    
     if (endDate) {
       localStorage.setItem('dashboardEndDate', endDate.toISOString());
     }
-    
-    onDateChange(startDate, endDate);
-  }, [startDate, endDate, onDateChange]);
+  }, [startDate, endDate]);
 
   return (
     <div className="relative flex items-center">
@@ -48,6 +45,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ onDateChange }) => {
         endDate={endDate}
         onChange={(update) => {
           setDateRange(update);
+          onDateChange(update[0], update[1], true); // true indicates user selection
         }}
         isClearable
         placeholderText="Select date range"

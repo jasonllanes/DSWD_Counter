@@ -273,14 +273,16 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const handleDateChange = useCallback((start: Date | null, end: Date | null) => {
+  const handleDateChange = useCallback((
+    start: Date | null, 
+    end: Date | null, 
+    isUserSelection: boolean = false
+  ) => {
     setStartDate(start);
     setEndDate(end);
     
-    // If both dates are selected, show total production for the range
-    if (start && end && data) {
-      // In a real application, you would fetch data for this date range from your backend
-      // For now, we'll just display the current data with a message about the date range
+    // Only show total production popup if it's a user selection
+    if (start && end && data && isUserSelection) {
       const totalProduction = data.lines.reduce(
         (sum, line) => sum + line.actualProduction, 
         0
