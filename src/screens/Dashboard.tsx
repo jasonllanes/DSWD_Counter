@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { fetchCurrentData } from "../services/api";
-import { saveDashboardData } from "../services/firebase";
+import { firebaseService } from "../services/firebase";
 import { exportToExcel } from "../utils/excelExport";
 import type { DashboardData } from "../types";
 import DashboardHeader from "./dashboard/components/DashboardHeader";
@@ -128,8 +128,8 @@ const Dashboard = () => {
 
     setSaving(true);
     try {
-      const result = await saveDashboardData(data);
-      if (result.success) {
+      const result = await firebaseService.saveProductionData(data);
+      if (result) {
         alert("Data successfully saved to Firestore!");
       } else {
         alert("Failed to save data. Please try again.");

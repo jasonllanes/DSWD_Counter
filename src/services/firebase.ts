@@ -5,6 +5,8 @@ import {
   query,
   orderBy,
   limit,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
 import type {
   DashboardData,
@@ -13,8 +15,9 @@ import type {
 } from "../types";
 import { db } from '@/config/firebase';
 
-// Collection references
-const PRODUCTION_COLLECTION = 'production_data';
+// Collection reference - single source of truth
+const COLLECTION_NAME = 'production_data';
+const OLD_COLLECTION_NAME = 'dashboardData';
 
 // Save dashboard data to Firestore
 export const saveDashboardData = async (
@@ -59,7 +62,7 @@ export const getRecentDashboardData = async (
 
 export const firebaseService = {
   // Save production data to Firebase with optimized structure
-  async saveProductionData(data: DashboardData) {
+  async saveProductionData(data: DashboardData): Promise<FirebaseResponse> {
     try {
       // Calculate summary statistics for quick access
       const totalProduction = data.lines.reduce(
@@ -113,20 +116,20 @@ export const firebaseService = {
         }
       };
 
-      const docRef = await addDoc(collection(db, PRODUCTION_COLLECTION), enhancedData);
+      const docRef = await addDoc(collection(db, COLLECTION_NAME), enhancedData);
       console.log('✅ Data saved to Firebase:', docRef.id);
-      return docRef.id;
+      return { success: true, id: docRef.id };
     } catch (error) {
       console.error('❌ Error saving data:', error);
-      throw error;
+      return { success: false, error };
     }
   },
 
   // Get latest production records
-  async getLatestRecords(limitCount: number = 10) {
+  async getLatestRecords(limitCount: number = 10): Promise<HistoricalDataItem[]> {
     try {
       const q = query(
-        collection(db, PRODUCTION_COLLECTION),
+        collection(db, COLLECTION_NAME),
         orderBy('timestamp', 'desc'),
         limit(limitCount)
       );
@@ -135,10 +138,10 @@ export const firebaseService = {
       return snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })) as HistoricalDataItem[];
     } catch (error) {
       console.error('❌ Error fetching records:', error);
-      throw error;
+      return [];
     }
   },
 
@@ -146,12 +149,8 @@ export const firebaseService = {
   async getRecordsByDate(date: string) {
     try {
       const q = query(
-        collection(db, PRODUCTION_COLLECTION),
-        // Query for documents with matching operationDate
+        collection(db, COLLECTION_NAME),
         orderBy('operationDate'),
-        // Use >= and < to get the entire day
-        // This is more efficient than using ==
-        // Since Firestore doesn't support != queries
         orderBy('timestamp', 'desc')
       );
       
@@ -181,7 +180,7 @@ export const firebaseService = {
       const endDateStr = endDate.toISOString().split('T')[0];
       
       const q = query(
-        collection(db, PRODUCTION_COLLECTION),
+        collection(db, COLLECTION_NAME),
         orderBy('operationDate'),
         orderBy('timestamp', 'desc')
       );
@@ -227,6 +226,123 @@ export const firebaseService = {
     } catch (error) {
       console.error('❌ Error fetching daily summaries:', error);
       throw error;
+    }
+  },
+
+  // Migration utility
+  async migrateOldData(): Promise<{ success: boolean; migrated: number; errors: number }> {
+    try {
+      // Get all documents from old collection
+      const oldCollectionRef = collection(db, OLD_COLLECTION_NAME);
+      const oldDataSnapshot = await getDocs(oldCollectionRef);
+      
+      let migratedCount = 0;
+      let errorCount = 0;
+
+      // Process each old document
+      for (const docSnapshot of oldDataSnapshot.docs) {
+        try {
+          const oldData = docSnapshot.data();
+          
+          // Transform old data to new format
+          const now = new Date(oldData.savedAt || new Date().toISOString());
+          const operationDate = now.toISOString().split('T')[0];
+          
+          // Calculate summary statistics
+          const totalProduction = oldData.lines.reduce(
+            (sum: number, line: any) => sum + (line.actualProduction || 0), 
+            0
+          );
+          const totalTarget = oldData.lines.reduce(
+            (sum: number, line: any) => sum + (line.dailyTarget || 0), 
+            0
+          );
+          const overallEfficiency = totalTarget > 0 
+            ? Math.round((totalProduction / totalTarget) * 100) 
+            : 0;
+
+          // Calculate line efficiencies
+          const lineEfficiencies = oldData.lines.map((line: any) => ({
+            id: line.id,
+            efficiency: line.dailyTarget > 0 
+              ? Math.round((line.actualProduction / line.dailyTarget) * 100) 
+              : 0
+          }));
+          
+          const topPerformingLineId = [...lineEfficiencies].sort(
+            (a, b) => b.efficiency - a.efficiency
+          )[0]?.id;
+          
+          const lowestPerformingLineId = [...lineEfficiencies].sort(
+            (a, b) => a.efficiency - b.efficiency
+          )[0]?.id;
+
+          // Create new format document
+          const enhancedData = {
+            siteId: 'cebu-center-1',
+            operationDate,
+            timestamp: now.toISOString(),
+            lines: oldData.lines,
+            summary: {
+              totalProduction,
+              totalTarget,
+              overallEfficiency,
+              topPerformingLineId,
+              lowestPerformingLineId
+            }
+          };
+
+          // Save to new collection
+          await addDoc(collection(db, COLLECTION_NAME), enhancedData);
+          migratedCount++;
+
+          // Delete old document
+          await deleteDoc(doc(db, OLD_COLLECTION_NAME, docSnapshot.id));
+        } catch (error) {
+          console.error(`Error migrating document ${docSnapshot.id}:`, error);
+          errorCount++;
+        }
+      }
+
+      return {
+        success: true,
+        migrated: migratedCount,
+        errors: errorCount
+      };
+    } catch (error) {
+      console.error('Migration failed:', error);
+      return {
+        success: false,
+        migrated: 0,
+        errors: 1
+      };
+    }
+  },
+
+  // Cleanup utility
+  async deleteOldCollection(): Promise<{ success: boolean; deleted: number }> {
+    try {
+      const oldCollectionRef = collection(db, OLD_COLLECTION_NAME);
+      const snapshot = await getDocs(oldCollectionRef);
+      
+      let deletedCount = 0;
+      
+      // Delete all remaining documents in old collection
+      for (const docSnapshot of snapshot.docs) {
+        await deleteDoc(docSnapshot.ref);
+        deletedCount++;
+      }
+
+      return {
+        success: true,
+        deleted: deletedCount
+      };
+    } catch (error) {
+      console.error('Cleanup failed:', error);
+      return {
+        success: false,
+        deleted: 0
+      };
     }
   }
 };
