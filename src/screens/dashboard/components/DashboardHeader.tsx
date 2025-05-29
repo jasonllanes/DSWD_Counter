@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Clock, RefreshCw, Calendar } from "react-feather";
 import dswd_logo from "../../../assets/dswd_logo.png";
 
@@ -7,39 +7,83 @@ type DashboardHeaderProps = {
 };
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ lastUpdated }) => {
-    const currentDate = new Date().toLocaleDateString('en-US', {
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    const formattedDate = currentTime.toLocaleDateString('en-US', {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
         year: 'numeric'
     });
 
+    const formattedTime = currentTime.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+
+    // Format the last updated text based on whether we have a timestamp
+    const formatLastUpdated = () => {
+        if (!lastUpdated) {
+            return "No updates yet";
+        }
+        return lastUpdated;
+    };
+
     return (
-        <header className="bg-[#2B45A3] w-full">
-            <div className="container mx-auto flex flex-col items-start justify-center py-4">
-                <div className="flex items-center gap-2 mb-2">
+        <header className="bg-gradient-to-r from-[#1e3a8a] via-[#2B45A3] to-[#1e40af]">
+            <div className="container mx-auto px-6 py-4">
+                {/* Logo and Title Section */}
+                <div className="flex items-center gap-4 mb-6">
                     <img
                         src={dswd_logo}
                         alt="DSWD Logo"
-                        className="h-8 w-8"
+                        className="h-14 w-14"
                     />
-                    <h1 className="text-white text-xl font-semibold">
-                        DSWD Cebu Relief Dashboard
-                    </h1>
+                    <div>
+                        <h1 className="text-white text-2xl font-bold tracking-wide">
+                            DSWD Cebu Relief Dashboard
+                        </h1>
+                        <p className="text-blue-200 text-sm mt-1">
+                            Real-time Monitoring System
+                        </p>
+                    </div>
                 </div>
-                
-                <div className="flex flex-col  gap-1 text-yellow-300 text-sm">
-                    <div className="flex ">
-                        <Calendar size={14} className="mr-1.5" />
-                        <span>{currentDate}</span>
+
+                {/* Time and Status Section */}
+                <div className="flex flex-wrap gap-4">
+                    {/* Date Card */}
+                    <div className="flex items-center bg-[#1e3a8a]/50 backdrop-blur-sm rounded-lg px-5 py-2.5">
+                        <Calendar size={20} className="text-blue-300 mr-3" />
+                        <span className="text-white font-medium">{formattedDate}</span>
                     </div>
-                    <div className="flex ">
-                        <Clock size={14} className="mr-1.5" />
-                        <span>Last updated: {lastUpdated}</span>
+
+                    {/* Time Card */}
+                    <div className="flex items-center bg-[#1e3a8a]/50 backdrop-blur-sm rounded-lg px-5 py-2.5">
+                        <Clock size={20} className="text-blue-300 mr-3" />
+                        <span className="text-white font-medium">{formattedTime}</span>
                     </div>
-                    <div className="flex ">
-                        <RefreshCw size={14} className="mr-1.5" />
-                        <span>Auto-refreshes every 5 seconds</span>
+
+                    {/* Last Updated Card */}
+                    <div className="flex items-center bg-[#1e3a8a]/50 backdrop-blur-sm rounded-lg px-5 py-2.5 ml-auto">
+                        <RefreshCw 
+                            size={20} 
+                            className={`text-green-400 mr-3 ${lastUpdated ? 'animate-spin' : ''}`} 
+                        />
+                        <div className="flex items-center">
+                            <span className="text-blue-200">Last updated:</span>
+                            <span className="ml-2 text-white font-medium">{formatLastUpdated()}</span>
+                            <div className={`w-2 h-2 rounded-full ml-3 ${lastUpdated ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}></div>
+                        </div>
                     </div>
                 </div>
             </div>
