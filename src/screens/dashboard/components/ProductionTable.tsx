@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -491,6 +491,40 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
         text: 'Failed to export data. Please try again.',
       });
     }
+  };
+
+  const formatLastUpdated = () => {
+    return new Date().toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  };
+
+  // Update the handleCellUpdate to include timestamp
+  const handleCellEdit = (lineId: number, fieldName: keyof LineData, newValue: number) => {
+    handleCellUpdate(lineId, fieldName, newValue);
+    
+    // Update the data with timestamp
+    if (data) {
+      const updatedData = {
+        ...data,
+        lastUpdated: formatLastUpdated()
+      };
+      onUpdateData(updatedData);
+    }
+
+    // Show success toast
+    Swal.fire({
+      title: 'Value Updated',
+      text: `${fieldName === 'dailyTarget' ? 'Daily' : 'Hourly'} target for Line ${lineId} updated to ${newValue}`,
+      icon: 'success',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
   };
 
   return (
