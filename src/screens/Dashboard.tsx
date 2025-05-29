@@ -14,7 +14,7 @@ const defaultLines = Array.from({ length: 8 }, (_, idx) => ({
   id: idx + 1,
   dailyTarget: 1000,
   hourlyTarget: 166,
-  productionPerHour: 150,
+  productionPerHour: 0,
   actualProduction: 0,
 }));
 
@@ -36,11 +36,13 @@ const Dashboard = () => {
     wsRef.current = new WebSocket("ws://localhost:4000");
     wsRef.current.onmessage = (event) => {
       const msg = event.data as string;
-      // Example: "Sensor 5 triggered, Total Score: 4"
-      const match = msg.match(/Sensor (\d+) triggered, Total Score: (\d+)/);
+      // We should update this to handle both the total score and rate from Arduino
+      // Example message should include both count and rate: "Sensor 5 triggered, Total Score: 4, Rate: 2"
+      const match = msg.match(/Sensor (\d+) triggered, Total Score: (\d+), Rate: (\d+)/);
       if (match) {
         const lineIdx = parseInt(match[1], 10) - 1;
         const totalScore = parseInt(match[2], 10);
+        const rate = parseInt(match[3], 10);  // Get the rate directly from Arduino
         setData((prev) => {
           if (!prev) {
             return {
@@ -48,7 +50,7 @@ const Dashboard = () => {
                 id: idx + 1,
                 dailyTarget: 1000,
                 hourlyTarget: 166,
-                productionPerHour: 150,
+                productionPerHour: idx === lineIdx ? rate : 0,  // Use rate from Arduino
                 actualProduction: idx === lineIdx ? totalScore : 0,
               })),
               timestamp: new Date().toISOString(),
@@ -56,7 +58,11 @@ const Dashboard = () => {
           }
           const lines = prev.lines.map((line, idx) =>
             idx === lineIdx
-              ? { ...line, actualProduction: totalScore }
+              ? {
+                  ...line,
+                  actualProduction: totalScore,
+                  productionPerHour: rate  // Use the rate value from Arduino
+                }
               : line
           );
           return { ...prev, lines, timestamp: new Date().toISOString() };
