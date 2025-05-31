@@ -1,5 +1,5 @@
 #include <SPI.h>
-#include <DMD.h>        
+#include <DMD.h>
 #include <TimerOne.h>
 #include "SystemFont5x7.h"
 #include "Arial_black_16.h"
@@ -66,7 +66,7 @@ int rateL5=0;
 int rateL6=0;
 int rateL7=0;
 int rateL8=0;
- 
+
 int rateL1a=0;
 int rateL1b=0;
 int rateL1c=0;
@@ -180,9 +180,9 @@ byte line7counter=0;
 byte line8counter=0;
 
 void p10scan()
-{ 
+{
   p10.scanDisplayBySPI();
-}    
+}
 
 void setup() {
   Timer1.initialize(3000);
@@ -208,10 +208,10 @@ void setup() {
   digitalWrite(SW8, LOW);
 
   p10.clearScreen( true );
-  p10.selectFont(Arial_Black_16);  
-  p10.drawString( 672,0,"  EMF",5, GRAPHICS_NORMAL );    
+  p10.selectFont(Arial_Black_16);
+  p10.drawString( 672,0,"  EMF",5, GRAPHICS_NORMAL );
   delay(1500);
-/* 
+/*
  while (keyword==0){
     if (Serial.available() > 0){
       Incomingvalue = Serial.read();
@@ -220,21 +220,21 @@ void setup() {
         }
        else{
         keyword = 0;
-        }  
+        }
       }
   }
  */
   p10.selectFont(SystemFont5x7);
   p10.clearScreen( true );
-  p10.drawString( 672,0,"Engineering",11, GRAPHICS_NORMAL );    
-  p10.drawString( 672,9," Solution",9, GRAPHICS_NORMAL );    
+  p10.drawString( 672,0,"Engineering",11, GRAPHICS_NORMAL );
+  p10.drawString( 672,9," Solution",9, GRAPHICS_NORMAL );
   delay(1500);
   p10.clearScreen( true );
-  p10.drawString( 672,9,"Counter",7, GRAPHICS_NORMAL );    
-  p10.drawString( 672,9,"Counter",7, GRAPHICS_NORMAL );    
+  p10.drawString( 672,9,"Counter",7, GRAPHICS_NORMAL );
+  p10.drawString( 672,9,"Counter",7, GRAPHICS_NORMAL );
   delay(1500);
   p10.clearScreen( true );
-  
+
 }
 
 // Add these variables to track interval-specific rates
@@ -265,7 +265,7 @@ int intervalRateL8 = 0;
    Serial.println(intervalRateL7);
    Serial.print("Rate8: ");
    Serial.println(intervalRateL8);
-   
+
    // Reset interval rates after sending
    intervalRateL1 = 0;
    intervalRateL2 = 0;
@@ -298,41 +298,40 @@ int intervalRateL8 = 0;
 
 // ... existing code ...
 void loop() {
-  timenew = millis();
-  
-  
+ timenew = millis();
+
+
 //   // Send production data every 5 seconds
   static unsigned long lastSend = 0;
   if (timenew - lastSend >= 60000) {
     sendAllActualProductionData();
     lastSend = timenew;
   }
-  
-  if (timenew - timeprev >= 1000){
-      timeprev = timenew;
-      h++;
-      if (h == 60){  // Changed from 3000 to 60 seconds (1 minute)
-        r++;
-        h = 0;
-        ProductionDivHr = 1;
-        sendProductionData();
-       
-        // sendProductionData();  // You might want to rename this to ProductionPerMin
-      }
-  }
-// ... existing code ...
 
-// void loop() {
-//   timenew = millis();
-//   if (timenew - timeprev >= 1000){
+// Uncomment if you want to make it into minutes
+//    if (timenew - timeprev >= 1000){
 //       timeprev = timenew;
 //       h++;
-//       if (h==3000){
+//       if (h == 60){  // Changed from 3000 to 60 seconds (1 minute)
 //         r++;
-//         h=0;
-//         ProductionDivHr=1;
+//         h = 0;
+//         ProductionDivHr = 1;
+//         sendProductionData();
+       
+//         // sendProductionData();  // You might want to rename this to ProductionPerMin
 //       }
-//   }
+
+    if (timenew - timeprev >= 1000){
+      timeprev = timenew;
+      h++;
+      if (h==3000){
+        r++;
+        h=0;
+        ProductionDivHr=1;
+        sendProductionData();
+      }
+  }
+
 
   if (Serial.available() > 0){
       Incomingvalue = Serial.read();
@@ -362,14 +361,14 @@ void loop() {
   }
   else{
      delaytime1 = timenew;
-        if (S1==1){ 
+        if (S1==1){
               if (timenew - delaytime1a >= 1500){
                   delaytime1a = timenew;
                   S1=0;
               }
         }
   }
- 
+
   if(digitalRead(SW2)== HIGH){
       if (S2==0){
           if (timenew - delaytime2 >= 200){
@@ -389,14 +388,14 @@ void loop() {
   }
   else{
      delaytime2 = timenew;
-        if (S2==1){ 
+        if (S2==1){
               if (timenew - delaytime2a >= 1500){
                   delaytime2a = timenew;
                   S2=0;
               }
         }
   }
-  
+
 
   if(digitalRead(SW3)== HIGH){
       if (S3==0){
@@ -417,14 +416,14 @@ void loop() {
   }
   else{
      delaytime3 = timenew;
-        if (S3==1){ 
+        if (S3==1){
               if (timenew - delaytime3a >= 1500){
                   delaytime3a = timenew;
                   S3=0;
               }
         }
   }
-  
+
   if(digitalRead(SW4)== HIGH){
       if (S4==0){
           if (timenew - delaytime4 >= 200){
@@ -444,7 +443,7 @@ void loop() {
   }
   else{
      delaytime4 = timenew;
-        if (S4==1){ 
+        if (S4==1){
               if (timenew - delaytime4a >= 1500){
                   delaytime4a = timenew;
                   S4=0;
@@ -452,7 +451,7 @@ void loop() {
         }
   }
 
-  
+
   if(digitalRead(SW5)== HIGH){
       if (S5==0){
           if (timenew - delaytime5 >= 200){
@@ -472,14 +471,14 @@ void loop() {
   }
   else{
      delaytime5 = timenew;
-        if (S5==1){ 
+        if (S5==1){
               if (timenew - delaytime5a >= 1500){
                   delaytime5a = timenew;
                   S5=0;
               }
         }
   }
-  
+
   if(digitalRead(SW6)== HIGH){
       if (S6==0){
           if (timenew - delaytime6 >= 200){
@@ -499,14 +498,14 @@ void loop() {
   }
   else{
      delaytime6 = timenew;
-        if (S6==1){ 
+        if (S6==1){
               if (timenew - delaytime6a >= 1500){
                   delaytime6a = timenew;
                   S6=0;
               }
         }
   }
-  
+
   if(digitalRead(SW7)== HIGH){
       if (S7==0){
           if (timenew - delaytime7 >= 200){
@@ -526,14 +525,14 @@ void loop() {
   }
   else{
      delaytime7 = timenew;
-        if (S7==1){ 
+        if (S7==1){
               if (timenew - delaytime7a >= 1500){
                   delaytime7a = timenew;
                   S7=0;
               }
         }
   }
-  
+
   if(digitalRead(SW8)== HIGH){
       if (S8==0){
           if (timenew - delaytime8 >= 200){
@@ -553,7 +552,7 @@ void loop() {
   }
   else{
      delaytime8 = timenew;
-        if (S8==1){ 
+        if (S8==1){
               if (timenew - delaytime8a >= 1500){
                   delaytime8a = timenew;
                   S8=0;
@@ -571,99 +570,99 @@ void loop() {
 
   case 100:
     if (line1rate==1){
-        rateL1++;          
+        rateL1++;
         if(rateL1>9999){
-           rateL1=0;         
+           rateL1=0;
         }
     }
     if (line2rate==1){
-        rateL2++;          
+        rateL2++;
         if(rateL2>9999){
-           rateL2=0;         
+           rateL2=0;
         }
     }
     if (line3rate==1){
-        rateL3++;          
+        rateL3++;
         if(rateL3>9999){
-           rateL3=0;         
+           rateL3=0;
         }
     }
     if (line4rate==1){
-        rateL4++;          
+        rateL4++;
         if(rateL4>9999){
-           rateL4=0;         
+           rateL4=0;
         }
     }
     if (line5rate==1){
-        rateL5++;          
+        rateL5++;
         if(rateL5>9999){
-           rateL5=0;         
+           rateL5=0;
         }
     }
     if (line6rate==1){
-        rateL6++;          
+        rateL6++;
         if(rateL6>9999){
-           rateL6=0;         
+           rateL6=0;
         }
     }
     if (line7rate==1){
-        rateL7++;          
+        rateL7++;
         if(rateL7>9999){
-           rateL7=0;         
+           rateL7=0;
         }
     }
     if (line8rate==1){
-        rateL8++;          
+        rateL8++;
         if(rateL8>9999){
-           rateL8=0;         
+           rateL8=0;
         }
     }
     if (line8counter==1){
-        L8++;          
+        L8++;
         if(L8>9999){
-           L8=0;            
+           L8=0;
         }
     }
     if (line1counter==1){
-        L1++;          
+        L1++;
         if(L1>9999){
-           L1=0;            
+           L1=0;
         }
     }
     if (line2counter==1){
-        L2++;          
+        L2++;
         if(L2>9999){
-           L2=0;            
+           L2=0;
         }
     }
     if (line3counter==1){
-        L3++;          
+        L3++;
         if(L3>9999){
-           L3=0;            
+           L3=0;
         }
     }
     if (line4counter==1){
-        L4++;          
+        L4++;
         if(L4>9999){
-           L4=0;            
+           L4=0;
         }
     }
     if (line5counter==1){
-        L5++;          
+        L5++;
         if(L5>9999){
-           L5=0;            
+           L5=0;
         }
     }
     if (line6counter==1){
-        L6++;          
+        L6++;
         if(L6>9999){
-           L6=0;            
+           L6=0;
         }
     }
     if (line7counter==1){
-        L7++;          
+        L7++;
         if(L7>9999){
-           L7=0;            
+           L7=0;
         }
     }
     LineCounter=1;
@@ -673,100 +672,100 @@ void loop() {
 
   case 104:
     if (line1rate==1){
-        rateL1--;          
+        rateL1--;
         if(rateL1<0){
-           rateL1=0;         
+           rateL1=0;
         }
     }
     if (line2rate==1){
-        rateL2--;          
+        rateL2--;
         if(rateL2<0){
-           rateL2=0;         
+           rateL2=0;
         }
     }
     if (line3rate==1){
-        rateL3--;          
+        rateL3--;
         if(rateL3<0){
-           rateL3=0;         
+           rateL3=0;
         }
     }
     if (line4rate==1){
-        rateL4--;          
+        rateL4--;
         if(rateL4<0){
-           rateL4=0;         
+           rateL4=0;
         }
     }
     if (line5rate==1){
-        rateL5--;          
+        rateL5--;
         if(rateL5<0){
-           rateL5=0;         
+           rateL5=0;
         }
     }
     if (line6rate==1){
-        rateL6--;          
+        rateL6--;
         if(rateL6<0){
-           rateL6=0;         
+           rateL6=0;
         }
     }
     if (line7rate==1){
-        rateL7--;          
+        rateL7--;
         if(rateL7<0){
-           rateL7=0;         
+           rateL7=0;
         }
     }
     if (line8rate==1){
-        rateL8--;          
+        rateL8--;
         if(rateL8<0){
-           rateL8=0;         
+           rateL8=0;
         }
     }
 
     if (line1counter==1){
-        L1--;          
+        L1--;
         if(L1<0){
-           L1=0;            
+           L1=0;
         }
     }
     if (line2counter==1){
-        L2--;          
+        L2--;
         if(L2<0){
-           L2=0;            
+           L2=0;
         }
     }
     if (line3counter==1){
-        L3--;          
+        L3--;
         if(L3<0){
-           L3=0;            
+           L3=0;
         }
     }
     if (line4counter==1){
-        L4--;          
+        L4--;
         if(L4<0){
-           L4=0;            
+           L4=0;
         }
     }
     if (line5counter==1){
-        L5--;          
+        L5--;
         if(L5<0){
-           L5=0;            
+           L5=0;
         }
     }
     if (line6counter==1){
-        L6--;          
+        L6--;
         if(L6<0){
-           L6=0;            
+           L6=0;
         }
     }
     if (line7counter==1){
-        L7--;          
+        L7--;
         if(L7<0){
-           L7=0;            
+           L7=0;
         }
     }
     if (line8counter==1){
-        L8--;          
+        L8--;
         if(L8<0){
-           L8=0;            
+           L8=0;
         }
     }
     LineCounter=1;
@@ -1238,7 +1237,7 @@ if (allcounter==1)
       x=489;
       y=0;
       SMALLCONVERT(47,x,y);
-  
+
 //++++++++++++++++++LINE3++hourlytarget++++++++++++++++++++++++++++++++++++++++++++++++++
 
       x=507;
@@ -1364,7 +1363,7 @@ if (allrate==1){
       x=73;
       y=0;
       SMALLCONVERT(47,x,y);
-  
+
 //++++++++++++++++++LINE3++target++++++++++++++++++++++++++++++++++++++++++++++++++
 
       x=91;
@@ -1487,7 +1486,7 @@ if (LineCounter==1)
   L4b= (L4/100)%10;
   L4c= (L4/10)%10;
   L4d= (L4%10);
-  
+
   L5a= (L5/1000);
   L5b= (L5/100)%10;
   L5c= (L5/10)%10;
@@ -1539,7 +1538,7 @@ if (LineCounter==1)
       x=489;
       y=0;
       SMALLCONVERT(L2d,x,y);
-  
+
 //++++++++++++++++++LINE3++Display++++++++++++++++++++++++++++++++++++++++++++++++++
 
       x=507;
@@ -1649,7 +1648,7 @@ if (ProductionDivHr==1)
   rateL1b=(rateL1/100)%10;
   rateL1c=(rateL1/10)%10;
   rateL1d=(rateL1%10);
-  
+
   rateL2a=(rateL2/1000);
   rateL2b=(rateL2/100)%10;
   rateL2c=(rateL2/10)%10;
@@ -1685,7 +1684,7 @@ if (ProductionDivHr==1)
   rateL8c=(rateL8/10)%10;
   rateL8d=(rateL8%10);
 
-  
+
 //++++++++++++++++++LINE1++Display++++++++++++++++++++++++++++++++++++++++++++++++++
 
       x=1;
@@ -1715,7 +1714,7 @@ if (ProductionDivHr==1)
       x=73;
       y=0;
       SMALLCONVERT(rateL2d,x,y);
-  
+
 //++++++++++++++++++LINE3++Display++++++++++++++++++++++++++++++++++++++++++++++++++
 
       x=91;
@@ -1827,12 +1826,12 @@ void SMALLCONVERT(int DIGIT,int LOCx,int LOCy)
       p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
       p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
       p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
@@ -1847,211 +1846,211 @@ void SMALLCONVERT(int DIGIT,int LOCx,int LOCy)
       p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
       p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
       p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 0:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 1:
       p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 2:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 );
 
     break;
 
   case 3:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 4:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 5:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 6:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 7:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 8:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
   case 9:
-      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );       p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); 
-      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); 
-      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); 
+      p10.writePixel( 0+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 0+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 0+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 1+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 1+LOCy, GRAPHICS_NORMAL, 0 );       p10.writePixel( 0+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 2+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 2+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 3+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 3+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 4+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 4+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 5+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 5+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 6+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 6+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 7+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 8+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 8+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 9+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 9+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 10+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 10+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 3+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 11+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 11+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 4+LOCx, 12+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 5+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 12+LOCy, GRAPHICS_NORMAL, 1 );
+      p10.writePixel( 0+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 1+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 13+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 13+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 2+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 14+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 7+LOCx, 14+LOCy, GRAPHICS_NORMAL, 0 );
+      p10.writePixel( 0+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 1+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 2+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 3+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 4+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 5+LOCx, 15+LOCy, GRAPHICS_NORMAL, 1 ); p10.writePixel( 6+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 ); p10.writePixel( 7+LOCx, 15+LOCy, GRAPHICS_NORMAL, 0 );
 
     break;
 
