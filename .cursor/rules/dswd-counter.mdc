@@ -1,0 +1,272 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# DSWD Relief Counter System - Arduino Optimization Guide
+
+## Current Implementation Overview
+Real-time production line counter system using Arduino for DSWD Relief operations, monitoring 8 conveyor lines with P10 LED Matrix display and React dashboard integration.
+
+## Critical Production Requirements
+1. **Accuracy Requirements**
+   - Zero missed counts on production lines
+   - No double-counting of items
+   - Accurate rate calculations per hour
+   - Real-time dashboard updates
+
+2. **Performance Targets**
+   - Support for high-speed counting (≤ 200ms between items)
+   - Maximum display lag: 1 second
+   - Reliable 8-hour continuous operation
+   - No data loss during power interruptions
+
+## Hardware Setup
+
+### 1. Core Components
+- Arduino Board (Mega 2560 recommended)
+- P10 LED Matrix Display
+- 8x Line Sensors (Digital)
+
+### 2. Pin Assignments
+```cpp
+// Current sensor pin configuration
+byte SW1 = 44;  // Line 1
+byte SW2 = 42;  // Line 2
+byte SW3 = 40;  // Line 3
+byte SW4 = 38;  // Line 4
+byte SW5 = 36;  // Line 5
+byte SW6 = 34;  // Line 6
+byte SW7 = 32;  // Line 7
+byte SW8 = 30;  // Line 8
+```
+
+### 3. Display Configuration
+```cpp
+#define ROW_MODULE 24
+#define COLUMN_MODULE 1
+DMD p10(ROW_MODULE, COLUMN_MODULE);
+```
+
+## Current Implementation Analysis
+
+### 1. Rate Calculation System
+```cpp
+// Current rate calculation per line
+int rateL1a = 0;  // Quarter 1 rate
+int rateL1b = 0;  // Quarter 2 rate
+int rateL1c = 0;  // Quarter 3 rate
+int rateL1d = 0;  // Quarter 4 rate
+// ... similar for lines 2-8
+
+// Production division tracking
+byte ProductionDivHr = 1;  // Current hour division (1-4)
+```
+
+### 2. Timing System
+```cpp
+// Base timing configuration
+unsigned long delaytime = 200;      // Base sensor delay
+unsigned long timeprev;             // Previous time marker
+unsigned long timenew;              // Current time marker
+
+// Per-line timing
+unsigned long delaytime1;           // Line 1 trigger time
+unsigned long delaytime1a;          // Line 1 reset time
+// ... similar for lines 2-8
+```
+
+### 3. Counter System
+```cpp
+// Per-line counters
+int L1 = 0000;  // Line 1 total count
+byte S1 = 0;    // Line 1 state
+// ... similar for lines 2-8
+
+// Rate tracking
+byte line1rate = 0;     // Current rate for Line 1
+byte line1counter = 0;  // Counter for rate calculation
+```
+
+## Priority Optimization Areas
+
+### 1. CRITICAL: Counter Accuracy
+Current Issues:
+- Possible missed counts during high-speed operation
+- Potential double-counting due to sensor bounce
+- Counter overflow risk on long runs
+
+Solutions:
+```cpp
+class PrecisionCounter {
+    private:
+        const uint8_t pin;
+        volatile uint32_t count;
+        uint32_t lastTrigger;
+        static const uint16_t DEBOUNCE_MICROS = 150;
+        
+    public:
+        void IRAM_ATTR handleInterrupt() {
+            uint32_t now = micros();
+            if (now - lastTrigger >= DEBOUNCE_MICROS) {
+                count++;
+                lastTrigger = now;
+            }
+        }
+};
+```
+
+### 2. CRITICAL: Rate Calculation
+Current Issues:
+- Complex quarterly rate system
+- Memory inefficient storage
+- Potential for calculation errors
+
+Solution:
+```cpp
+struct RateCalculator {
+    static const uint8_t QUARTERS = 4;
+    uint16_t quarterlyRates[QUARTERS];
+    uint32_t lastUpdate;
+    
+    uint16_t calculateHourlyRate() {
+        uint32_t total = 0;
+        for(uint8_t i = 0; i < QUARTERS; i++) {
+            total += quarterlyRates[i];
+        }
+        return total / QUARTERS;
+    }
+};
+```
+
+### 3. HIGH: Memory Optimization
+Current Issues:
+- Redundant variable declarations
+- Inefficient data types
+- Fragmented memory usage
+
+Solution:
+```cpp
+struct LineData {
+    uint32_t count;
+    RateCalculator rates;
+    uint32_t lastTrigger;
+    bool state;
+    
+    static const uint8_t BUFFER_SIZE = 10;
+    uint16_t rateBuffer[BUFFER_SIZE];
+} lines[8];  // All lines in one struct
+```
+
+### 4. MEDIUM: Display Updates
+Current Issues:
+- Frequent full screen refreshes
+- High CPU usage during updates
+- Potential display flicker
+
+Solution:
+```cpp
+class OptimizedDisplay {
+    private:
+        uint32_t lastUpdate;
+        bool needsFullRefresh;
+        
+    public:
+        void updateDisplay() {
+            if (millis() - lastUpdate >= DISPLAY_INTERVAL) {
+                if (needsFullRefresh) {
+                    p10.clearScreen(true);
+                    needsFullRefresh = false;
+                } else {
+                    updateChangedSegments();
+                }
+                lastUpdate = millis();
+            }
+        }
+};
+```
+
+## Implementation Phases
+
+### Phase 1: Critical Safety Updates
+1. Implement interrupt-based counting
+2. Add overflow protection
+3. Improve debounce reliability
+4. Add data validation
+
+### Phase 2: Performance Optimization
+1. Optimize memory usage
+2. Improve rate calculations
+3. Enhance display updates
+4. Add error recovery
+
+### Phase 3: Quality of Life
+1. Add diagnostic features
+2. Implement data logging
+3. Add configuration options
+4. Enhance error reporting
+
+## Testing Requirements
+
+### 1. Production Testing
+- 8-hour continuous operation test
+- High-speed counting verification
+- Power interruption recovery
+- Multi-line simultaneous counting
+
+### 2. Rate Calculation Testing
+- Accuracy at different speeds
+- Quarter-hour rate verification
+- Daily target tracking
+- Rate display accuracy
+
+### 3. System Integration
+- Dashboard data accuracy
+- Real-time update verification
+- Error handling validation
+- Recovery procedures
+
+## Hardware Recommendations
+
+### 1. Sensor Optimization
+- Add hardware debouncing (RC circuit)
+- Use shielded cables
+- Consider optical isolation
+- Add status LEDs
+
+### 2. Power Management
+- Add power filtering
+- Implement brownout detection
+- Consider backup power
+- Add surge protection
+
+### 3. Display Enhancement
+- Optimize refresh rate
+- Add brightness control
+- Improve visibility
+- Reduce power consumption
+
+## Documentation Requirements
+
+### 1. Code Documentation
+- Function descriptions
+- Variable explanations
+- Timing diagrams
+- State machine flows
+
+### 2. Hardware Documentation
+- Circuit diagrams
+- Pin assignments
+- Sensor specifications
+- Power requirements
+
+### 3. Maintenance Guide
+- Calibration procedures
+- Troubleshooting steps
+- Regular maintenance
+- Error code reference
+
+
+
+
+
