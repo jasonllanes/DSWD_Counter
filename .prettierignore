@@ -8,3 +8,23 @@ node_modules
 # Misc
 .git
 .cache
+
+# Package files
+package-lock.json
+yarn.lock
+
+# Coverage reports
+coverage
+
+# Environment files
+.env*
+
+# Arduino files (since they use different formatting)
+*.ino
+
+# Public assets
+public/
+assets/
+
+# Generated files
+*.generated.*
