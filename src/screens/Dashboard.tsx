@@ -1,46 +1,46 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { fetchCurrentData } from "../services/api";
-import { firebaseService } from "../services/firebase";
-import { exportToExcel } from "../utils/excelExport";
-import type { DashboardData } from "../types";
-import DashboardHeader from "./dashboard/components/DashboardHeader";
-import ProductionTable from "./dashboard/components/ProductionTable";
-import StatisticsCards from "./dashboard/components/StatisticCard";
-import ProductionChart from "./dashboard/components/ProductionChart";
-import ProductionTrends from "./dashboard/components/ProductionTrends";
-import LoadingSpinner from "./dashboard/components/LoadingSpinner";
+import { useState, useEffect, useMemo, useRef } from "react"
+import { fetchCurrentData } from "../services/api"
+import { firebaseService } from "../services/firebase"
+import { exportToExcel } from "../utils/excelExport"
+import type { DashboardData } from "../types"
+import DashboardHeader from "./dashboard/components/DashboardHeader"
+import ProductionTable from "./dashboard/components/ProductionTable"
+import StatisticsCards from "./dashboard/components/StatisticCard"
+import ProductionChart from "./dashboard/components/ProductionChart"
+import ProductionTrends from "./dashboard/components/ProductionTrends"
+import LoadingSpinner from "./dashboard/components/LoadingSpinner"
 
 const defaultLines = Array.from({ length: 8 }, (_, idx) => ({
   id: idx + 1,
   dailyTarget: 1000,
   hourlyTarget: 166,
-  productionPerHour: 150,
+  productionPerHour: 0,
   actualProduction: 0,
-}));
+}))
 
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData>({
     lines: defaultLines,
     timestamp: new Date().toISOString(),
-  });
-  const [loading, setLoading] = useState<boolean>(true);
-  const [saving, setSaving] = useState<boolean>(false);
-  const [lastUpdated, setLastUpdated] = useState<string>("");
-  const wsRef = useRef<WebSocket | null>(null);
+  })
+  const [loading, setLoading] = useState<boolean>(true)
+  const [saving, setSaving] = useState<boolean>(false)
+  const [lastUpdated, setLastUpdated] = useState<string>("")
+  const wsRef = useRef<WebSocket | null>(null)
 
   // Fetch data initially and set up interval for real-time updates
   useEffect(() => {
-    setLoading(true);
+    setLoading(true)
 
     // WebSocket setup for real-time sensor updates
-    wsRef.current = new WebSocket("ws://localhost:4000");
+    wsRef.current = new WebSocket("ws://localhost:4000")
     wsRef.current.onmessage = (event) => {
-      const msg = event.data as string;
+      const msg = event.data as string
       // Example: "Sensor 5 triggered, Total Score: 4"
-      const match = msg.match(/Sensor (\d+) triggered, Total Score: (\d+)/);
+      const match = msg.match(/Sensor (\d+) triggered, Total Score: (\d+)/)
       if (match) {
-        const lineIdx = parseInt(match[1], 10) - 1;
-        const totalScore = parseInt(match[2], 10);
+        const lineIdx = parseInt(match[1], 10) - 1
+        const totalScore = parseInt(match[2], 10)
         setData((prev) => {
           if (!prev) {
             return {
@@ -48,121 +48,118 @@ const Dashboard = () => {
                 id: idx + 1,
                 dailyTarget: 1000,
                 hourlyTarget: 166,
-                productionPerHour: 150,
+                productionPerHour: 0,
                 actualProduction: idx === lineIdx ? totalScore : 0,
               })),
               timestamp: new Date().toISOString(),
-            };
+            }
           }
           const lines = prev.lines.map((line, idx) =>
-            idx === lineIdx
-              ? { ...line, actualProduction: totalScore }
-              : line
-          );
-          return { ...prev, lines, timestamp: new Date().toISOString() };
-        });
-        setLastUpdated(new Date().toLocaleTimeString());
-        setLoading(false);
+            idx === lineIdx ? { ...line, actualProduction: totalScore } : line
+          )
+          return { ...prev, lines, timestamp: new Date().toISOString() }
+        })
+        setLastUpdated(new Date().toLocaleTimeString())
+        setLoading(false)
       }
-    };
+    }
 
     wsRef.current.onerror = (err) => {
-      console.error("WebSocket error:", err);
-      setLoading(false);
-    };
+      console.error("WebSocket error:", err)
+      setLoading(false)
+    }
 
     // Fallback: stop loading after 5 seconds if no data
     const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
+      setLoading(false)
+    }, 5000)
 
     return () => {
-      wsRef.current?.close();
-      clearTimeout(timeout);
-    };
-  }, []);
+      wsRef.current?.close()
+      clearTimeout(timeout)
+    }
+  }, [])
 
   // Calculate statistics for dashboard cards
   const statistics = useMemo(() => {
-    if (!data) return null;
+    if (!data) return null
 
     // Calculate overall efficiency
     const totalProduction = data.lines.reduce(
       (sum, line) => sum + line.actualProduction,
       0
-    );
+    )
     const totalTarget = data.lines.reduce(
       (sum, line) => sum + line.dailyTarget,
       0
-    );
-    const overallEfficiency = totalTarget > 0
-      ? Math.round((totalProduction / totalTarget) * 100)
-      : 0;
+    )
+    const overallEfficiency =
+      totalTarget > 0 ? Math.round((totalProduction / totalTarget) * 100) : 0
 
     // Find top performing line
     const lineEfficiencies = data.lines.map((line) => ({
       id: line.id,
       efficiency: Math.round((line.actualProduction / line.dailyTarget) * 100),
-    }));
+    }))
 
     const topLine = [...lineEfficiencies].sort(
       (a, b) => b.efficiency - a.efficiency
-    )[0];
+    )[0]
 
     // Find line needing attention (lowest efficiency)
     const needsAttentionLine = [...lineEfficiencies].sort(
       (a, b) => a.efficiency - b.efficiency
-    )[0];
+    )[0]
 
     return {
       overallEfficiency,
       totalProduction,
       topLine,
       needsAttentionLine,
-    };
-  }, [data]);
+    }
+  }, [data])
 
   // Handle saving data to Firestore
   const handleSaveToCloud = async () => {
-    if (!data) return;
+    if (!data) return
 
-    setSaving(true);
+    setSaving(true)
     try {
-      const result = await firebaseService.saveProductionData(data);
+      const result = await firebaseService.saveProductionData(data)
       if (result) {
-        alert("Data successfully saved to Firestore!");
+        alert("Data successfully saved to Firestore!")
       } else {
-        alert("Failed to save data. Please try again.");
+        alert("Failed to save data. Please try again.")
       }
     } catch (error) {
-      console.error("Error saving data:", error);
-      alert("An error occurred while saving data.");
+      console.error("Error saving data:", error)
+      alert("An error occurred while saving data.")
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   // Handle exporting data to Excel
   const handleExportToExcel = () => {
-    if (!data) return;
+    if (!data) return
     exportToExcel(
       data,
       `dashboard-data-${new Date().toISOString().split("T")[0]}.xlsx`
-    );
-  };
+    )
+  }
 
   // Handle updated data from editable cells
   const handleUpdateData = (updatedData: DashboardData) => {
-    console.log("Dashboard received updated data:", updatedData);
-    setData(updatedData);
+    console.log("Dashboard received updated data:", updatedData)
+    setData(updatedData)
     // Update the timestamp to reflect the change
-    const newTimestamp = new Date().toLocaleTimeString();
-    setLastUpdated(newTimestamp);
-    console.log("Dashboard updated timestamp:", newTimestamp);
-  };
+    const newTimestamp = new Date().toLocaleTimeString()
+    setLastUpdated(newTimestamp)
+    console.log("Dashboard updated timestamp:", newTimestamp)
+  }
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner />
   }
 
   return (
@@ -183,7 +180,7 @@ const Dashboard = () => {
         </div>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
