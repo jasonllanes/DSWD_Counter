@@ -129,6 +129,70 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     }
   }
 
+  const handleResetHourlyTargets = async () => {
+    // Show confirmation dialog with input
+    const { value: newTarget } = await Swal.fire({
+      title: "Reset All Hourly Targets",
+      input: "number",
+      inputLabel: "Enter new hourly target value for all lines:",
+      inputPlaceholder: "e.g., 100",
+      showCancelButton: true,
+      confirmButtonText: "OK",
+      confirmButtonColor: "#3B82F6",
+      cancelButtonColor: "#EF4444",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter a value"
+        }
+        if (Number(value) < 0) {
+          return "Value cannot be negative"
+        }
+      },
+      customClass: {
+        confirmButton: "swal2-confirm rounded-md px-4 py-2",
+        cancelButton: "swal2-cancel rounded-md px-4 py-2",
+        input: "swal2-input rounded-md border-gray-300",
+      },
+    })
+
+    if (newTarget) {
+      try {
+        // Update all lines with new hourly target
+        if (tableData) {
+          const updatedLines = tableData.lines.map((line) => ({
+            ...line,
+            hourlyTarget: Number(newTarget),
+          }))
+
+          const updatedData = {
+            ...tableData,
+            lines: updatedLines,
+            timestamp: new Date().toISOString(),
+          }
+
+          // Update the data
+          onUpdateData(updatedData)
+
+          // Show success message
+          Swal.fire({
+            icon: "success",
+            title: "Hourly Targets Updated",
+            text: `All lines have been set to ${newTarget}`,
+            timer: 2000,
+            showConfirmButton: false,
+          })
+        }
+      } catch (error) {
+        console.error("Error resetting hourly targets:", error)
+        Swal.fire({
+          icon: "error",
+          title: "Reset Failed",
+          text: "Failed to reset hourly targets. Please try again.",
+        })
+      }
+    }
+  }
+
   // Add getCellClassName helper function
   const getCellClassName = (info: any) => {
     const row = info.row.original
@@ -698,7 +762,7 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
             </button>
 
             <button
-              onClick={handleExportToExcel}
+              onClick={handleResetHourlyTargets}
               className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md flex items-center"
             >
               <Download size={16} className="mr-2" />
