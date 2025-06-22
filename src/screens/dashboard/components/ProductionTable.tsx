@@ -5,7 +5,13 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { BarChart2, Download, Upload, Calendar } from "react-feather"
+import {
+  BarChart2,
+  Download,
+  Upload,
+  Calendar,
+  RefreshCcw,
+} from "react-feather"
 import type { DashboardData, DashboardRowData } from "../../../types"
 import ExcelJS from "exceljs"
 import { saveAs } from "file-saver"
@@ -57,6 +63,71 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
     initialData: data,
     onUpdateData,
   })
+
+  const handleResetDailyTargets = async () => {
+    // Show confirmation dialog with input
+    const { value: newTarget } = await Swal.fire({
+      title: "Reset All Daily Targets",
+      input: "number",
+      inputLabel: "Enter new daily target value for all lines:",
+      inputPlaceholder: "e.g., 1000",
+      showCancelButton: true,
+      confirmButtonText: "OK",
+      confirmButtonColor: "#3B82F6",
+      cancelButtonColor: "#EF4444",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter a value"
+        }
+        if (Number(value) < 0) {
+          return "Value cannot be negative"
+        }
+      },
+
+      customClass: {
+        confirmButton: "swal2-confirm rounded-md px-4 py-2",
+        cancelButton: "swal2-cancel rounded-md px-4 py-2",
+        input: "swal2-input rounded-md border-gray-300",
+      },
+    })
+
+    if (newTarget) {
+      try {
+        // Update all lines with new daily target
+        if (tableData) {
+          const updatedLines = tableData.lines.map((line) => ({
+            ...line,
+            dailyTarget: Number(newTarget),
+          }))
+
+          const updatedData = {
+            ...tableData,
+            lines: updatedLines,
+            timestamp: new Date().toISOString(),
+          }
+
+          // Update the data
+          onUpdateData(updatedData)
+
+          // Show success message
+          Swal.fire({
+            icon: "success",
+            title: "Daily Targets Updated",
+            text: `All lines have been set to ${newTarget}`,
+            timer: 2000,
+            showConfirmButton: false,
+          })
+        }
+      } catch (error) {
+        console.error("Error resetting daily targets:", error)
+        Swal.fire({
+          icon: "error",
+          title: "Reset Failed",
+          text: "Failed to reset daily targets. Please try again.",
+        })
+      }
+    }
+  }
 
   // Add getCellClassName helper function
   const getCellClassName = (info: any) => {
@@ -619,10 +690,10 @@ const ProductionTable: React.FC<ProductionTableProps> = ({
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={handleExportToExcel}
+              onClick={handleResetDailyTargets}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
             >
-              <Download size={16} className="mr-2" />
+              <RefreshCcw size={16} className="mr-2" />
               Reset All Daily Targets
             </button>
 
