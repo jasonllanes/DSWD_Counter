@@ -1,3 +1,5 @@
+/* eslint-env node */
+import "dotenv/config";
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
 import { WebSocketServer } from "ws";
@@ -5,11 +7,11 @@ import { WebSocketServer } from "ws";
 const wss = new WebSocketServer({ port: 4000 });
 console.log("✅ WebSocket server running on ws://localhost:4000");
 
-// Mock data state
-const mockData = {
-  currentLine: 1,
-  totalScore: 0,
-};
+// // Mock data state (disabled by default)
+// const mockData = {
+//   currentLine: 1,
+//   totalScore: 0,
+// };
 
 // Function to generate realistic mock data
 // function generateMockData() {
@@ -32,17 +34,43 @@ async function setupHardwareConnection() {
   try {
     // List all available ports
     const ports = await SerialPort.list();
-    const arduinoPort = ports.find(port => 
-      port.path === "COM6" || 
-      (port.manufacturer && port.manufacturer.includes("Arduino"))
-    );
 
-    if (!arduinoPort) {
-      throw new Error("Arduino not found on COM5 or any other port");
+    const envPortRaw = process.env.VITE_ARDUINO_PORT;
+    const envPort = envPortRaw ? envPortRaw.trim() : "";
+
+    let selectedPort = null;
+
+    // 1) If env specifies a concrete COM port (not AUTO), prefer it
+    if (envPort && envPort.toUpperCase() !== "AUTO") {
+      selectedPort = ports.find((p) => p.path === envPort) || null;
+      if (selectedPort) {
+        console.log(`🔌 Using Arduino port from .env: ${envPort}`);
+      } else {
+        console.warn(
+          `⚠️ .env VITE_ARDUINO_PORT='${envPort}' not found among available ports. Falling back to auto-detect...`
+        );
+      }
+    }
+
+    // 2) Auto-detect by manufacturer if not found or AUTO requested
+    if (!selectedPort) {
+      selectedPort =
+        ports.find((p) => (p.manufacturer || "").toLowerCase().includes("arduino")) || null;
+      if (selectedPort) {
+        console.log(`🔍 Auto-detected Arduino on ${selectedPort.path}`);
+      }
+    }
+
+    // 3) If still not found, provide helpful info and run without hardware
+    if (!selectedPort) {
+      const available = ports.map((p) => p.path).join(", ") || "none";
+      throw new Error(
+        `Arduino not found. Set VITE_ARDUINO_PORT in .env or ensure device is connected. Available ports: ${available}`
+      );
     }
 
     const port = new SerialPort({
-      path: arduinoPort.path,
+      path: selectedPort.path,
       baudRate: 9600,
     });
 
@@ -60,7 +88,7 @@ async function setupHardwareConnection() {
       // startMockMode();
     });
 
-    console.log(`✅ Connected to Arduino on ${arduinoPort.path}`);
+    console.log(`✅ Connected to Arduino on ${selectedPort.path}`);
     return true;
 
   } catch (error) {
@@ -96,7 +124,7 @@ wss.on("connection", (ws) => {
 // Start the application
 async function start() {
   try {
-    const isHardwareConnected = await setupHardwareConnection();
+    await setupHardwareConnection();
     // if (!isHardwareConnected) {
     //   startMockMode();
     // }
