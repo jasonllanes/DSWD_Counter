@@ -23,7 +23,7 @@
     "@serialport/parser-readline": "^13.0.0",
     "@tanstack/react-table": "^8.20.5",
     "@types/react-datepicker": "^6.2.0",
-    "axios": "^1.7.8",
+    "axios": "^1.15.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "concurrently": "^8.2.2",
